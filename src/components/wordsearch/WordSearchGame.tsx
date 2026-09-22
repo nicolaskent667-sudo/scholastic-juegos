@@ -26,9 +26,11 @@ const IDLE_MESSAGE = "¿Dónde estarán?";
 
 type Props = {
   onBack: () => void;
+  /** Lleva al memotest. */
+  onNextGame: () => void;
 };
 
-export default function WordSearchGame({ onBack }: Props) {
+export default function WordSearchGame({ onBack, onNextGame }: Props) {
   const { progress, unlock, markWorldDone } = useProgress();
   const [world, setWorld] = useState<World | null>(null);
   const [board, setBoard] = useState<Board | null>(null);
@@ -234,6 +236,7 @@ export default function WordSearchGame({ onBack }: Props) {
           seconds={elapsed}
           hintsUsed={hintsUsed}
           hasNextWorld={hasNextWorld}
+          onNextGame={onNextGame}
           onNextWorld={nextWorld}
           onReplay={() => startWorld(world)}
           onWorlds={backToWorlds}

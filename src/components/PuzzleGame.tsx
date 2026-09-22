@@ -29,6 +29,8 @@ type Props = {
   onNextGame: () => void;
   /** Atajo directo al nivel 3. */
   onSkipToWordSearch: () => void;
+  /** Atajo directo al nivel 4. */
+  onSkipToMemo: () => void;
   /** Vuelve a la portada. */
   onHome: () => void;
 };
@@ -36,6 +38,7 @@ type Props = {
 export default function PuzzleGame({
   onNextGame,
   onSkipToWordSearch,
+  onSkipToMemo,
   onHome,
 }: Props) {
   const { unlock } = useProgress();
@@ -170,6 +173,7 @@ export default function PuzzleGame({
         onStart={startLevel}
         onSkipToFlappy={onNextGame}
         onSkipToWordSearch={onSkipToWordSearch}
+        onSkipToMemo={onSkipToMemo}
         onHome={onHome}
       />
     );

@@ -8,6 +8,7 @@ type Props = {
   /** Atajos a los otros niveles, sin tener que completar el rompecabezas. */
   onSkipToFlappy: () => void;
   onSkipToWordSearch: () => void;
+  onSkipToMemo: () => void;
   /** Vuelve a la portada. */
   onHome: () => void;
 };
@@ -16,6 +17,7 @@ export default function DifficultyPicker({
   onStart,
   onSkipToFlappy,
   onSkipToWordSearch,
+  onSkipToMemo,
   onHome,
 }: Props) {
   return (
@@ -95,6 +97,13 @@ export default function DifficultyPicker({
             className="cursor-pointer rounded-full border-[3px] border-tinta/30 px-4 py-2 text-sm font-bold text-tinta/60 outline-none transition hover:border-tinta hover:bg-crema hover:text-tinta focus-visible:ring-4 focus-visible:ring-cielo-azul"
           >
             🔤 Sopa de letras
+          </button>
+          <button
+            type="button"
+            onClick={onSkipToMemo}
+            className="cursor-pointer rounded-full border-[3px] border-tinta/30 px-4 py-2 text-sm font-bold text-tinta/60 outline-none transition hover:border-tinta hover:bg-crema hover:text-tinta focus-visible:ring-4 focus-visible:ring-cielo-azul"
+          >
+            🃏 Memotest
           </button>
         </div>
       </div>

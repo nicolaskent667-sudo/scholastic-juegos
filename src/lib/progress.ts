@@ -3,7 +3,12 @@
  * Sin React: solo lectura/escritura y las definiciones.
  */
 
+import type { MemoLevelId } from "@/lib/memo";
+
 export type AchievementId =
+  | "memo-first"
+  | "memo-expert"
+  | "memo-perfect"
   | "puzzle-first"
   | "puzzle-hard"
   | "puzzle-fast"
@@ -31,6 +36,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "words-first", emoji: "🔤", name: "Primera sopa", how: "Completá un mundo de la sopa de letras" },
   { id: "words-nohint", emoji: "🧠", name: "Sin ayuda", how: "Completá un mundo sin usar pistas" },
   { id: "words-all", emoji: "🏆", name: "Las 52 palabras", how: "Completá los nueve mundos" },
+  { id: "memo-first", emoji: "🃏", name: "Buena memoria", how: "Completá un memotest" },
+  { id: "memo-expert", emoji: "🎓", name: "Ojo de lince", how: "Completá el memotest experto" },
+  { id: "memo-perfect", emoji: "✨", name: "Memoria perfecta", how: "Completá un memotest sin errar ni una" },
 ];
 
 export const STARS_GOAL = 30;
@@ -40,12 +48,17 @@ export type Settings = {
   reducedMotion: boolean;
 };
 
+/** Mejor marca de un nivel de memotest: menos intentos primero. */
+export type MemoRecord = { tries: number; seconds: number };
+export type MemoBest = Partial<Record<MemoLevelId, MemoRecord>>;
+
 export type Progress = {
   unlocked: AchievementId[];
   /** Estrellas acumuladas entre todas las partidas del nivel de vuelo. */
   stars: number;
   /** Mundos de la sopa de letras ya completados. */
   worldsDone: number[];
+  memoBest: MemoBest;
   settings: Settings;
 };
 
@@ -53,8 +66,18 @@ export const DEFAULT_PROGRESS: Progress = {
   unlocked: [],
   stars: 0,
   worldsDone: [],
+  memoBest: {},
   settings: { reducedMotion: false },
 };
+
+const MEMO_LEVEL_IDS = new Set<string>(["facil", "dificil", "experto"]);
+
+/** Una marca mejora a otra si usó menos intentos, o los mismos en menos tiempo. */
+export function isBetterRecord(next: MemoRecord, prev?: MemoRecord): boolean {
+  if (!prev) return true;
+  if (next.tries !== prev.tries) return next.tries < prev.tries;
+  return next.seconds < prev.seconds;
+}
 
 export const STORAGE_KEY = "scholastic-juegos:progreso:v1";
 
@@ -87,10 +110,32 @@ function sanitize(raw: unknown): Progress {
 
   const settings = (data.settings ?? {}) as Record<string, unknown>;
 
+  const memoBest: MemoBest = {};
+  if (typeof data.memoBest === "object" && data.memoBest !== null) {
+    for (const [key, value] of Object.entries(data.memoBest)) {
+      if (!MEMO_LEVEL_IDS.has(key) || typeof value !== "object" || value === null) {
+        continue;
+      }
+      const record = value as Record<string, unknown>;
+      if (
+        typeof record.tries === "number" &&
+        Number.isFinite(record.tries) &&
+        typeof record.seconds === "number" &&
+        Number.isFinite(record.seconds)
+      ) {
+        memoBest[key as MemoLevelId] = {
+          tries: Math.max(0, Math.floor(record.tries)),
+          seconds: Math.max(0, Math.floor(record.seconds)),
+        };
+      }
+    }
+  }
+
   return {
     unlocked: [...new Set(unlocked)],
     stars,
     worldsDone: [...new Set(worldsDone)],
+    memoBest,
     settings: { reducedMotion: settings.reducedMotion === true },
   };
 }

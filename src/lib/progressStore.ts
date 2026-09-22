@@ -12,12 +12,15 @@ import {
   STARS_GOAL,
   STORAGE_KEY,
   clearProgress,
+  isBetterRecord,
   loadProgress,
   saveProgress,
   type AchievementId,
+  type MemoRecord,
   type Progress,
   type Settings,
 } from "@/lib/progress";
+import type { MemoLevelId } from "@/lib/memo";
 
 export type Snapshot = {
   progress: Progress;
@@ -124,6 +127,26 @@ export function markWorldDone(worldId: number, totalWorlds: number): void {
     unlocked.add("words-first");
     if (worldsDone.length >= totalWorlds) unlocked.add("words-all");
     return { ...prev, worldsDone, unlocked: [...unlocked] };
+  });
+}
+
+/** Guarda la marca del memotest si mejora la anterior, y los logros que toque. */
+export function recordMemoResult(
+  levelId: MemoLevelId,
+  result: MemoRecord,
+  perfect: boolean,
+): void {
+  update((prev) => {
+    const unlocked = new Set(prev.unlocked);
+    unlocked.add("memo-first");
+    if (levelId === "experto") unlocked.add("memo-expert");
+    if (perfect) unlocked.add("memo-perfect");
+
+    const memoBest = isBetterRecord(result, prev.memoBest[levelId])
+      ? { ...prev.memoBest, [levelId]: result }
+      : prev.memoBest;
+
+    return { ...prev, memoBest, unlocked: [...unlocked] };
   });
 }
 

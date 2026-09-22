@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import BirdSprite from "@/components/flappy/BirdSprite";
+import BirdSprite from "@/components/sprites/BirdSprite";
 import LampPost from "@/components/flappy/LampPost";
 import Scenery from "@/components/flappy/Scenery";
 import StarCoin from "@/components/flappy/StarCoin";

@@ -6,6 +6,7 @@ import {
   getServerSnapshot,
   getSnapshot,
   markWorldDone,
+  recordMemoResult,
   resetProgress,
   setSettings,
   subscribe,
@@ -29,6 +30,7 @@ export function useProgress() {
     unlock,
     addStars,
     markWorldDone,
+    recordMemoResult,
     setSettings,
     reset: resetProgress,
   };

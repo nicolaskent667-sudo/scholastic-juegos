@@ -1,8 +1,8 @@
 "use client";
 
-import BirdSprite from "@/components/flappy/BirdSprite";
-import ChickSprite from "@/components/wordsearch/ChickSprite";
-import DogSprite from "@/components/wordsearch/DogSprite";
+import BirdSprite from "@/components/sprites/BirdSprite";
+import ChickSprite from "@/components/sprites/ChickSprite";
+import DogSprite from "@/components/sprites/DogSprite";
 
 type Props = {
   message: string;

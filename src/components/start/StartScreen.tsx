@@ -4,7 +4,7 @@ import { useState } from "react";
 import AchievementsPanel from "@/components/start/AchievementsPanel";
 import OptionsPanel from "@/components/start/OptionsPanel";
 import StartScene from "@/components/start/StartScene";
-import DogSprite from "@/components/wordsearch/DogSprite";
+import DogSprite from "@/components/sprites/DogSprite";
 import { useProgress } from "@/hooks/useProgress";
 import { ACHIEVEMENTS } from "@/lib/progress";
 
