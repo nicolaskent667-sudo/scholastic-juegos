@@ -30,7 +30,14 @@ const LAYER_SPEED = { back: 0.15, mid: 0.45, ground: 1 } as const;
 const STEP = 1 / 120;
 const MAX_FRAME_DELTA = 0.05;
 
-export function useFlappyEngine() {
+export type FlappyOutcome = { stars: number; hearts: number; seconds: number };
+
+/**
+ * `onWin` se dispara dentro del bucle, en el momento exacto en que se cruza el
+ * último farol. Se avisa así, y no con un efecto sobre `status`, para no meter
+ * un setState en el cuerpo de un efecto.
+ */
+export function useFlappyEngine(onWin?: (outcome: FlappyOutcome) => void) {
   // --- Estado que se muestra en el HUD: cambia poco, vive en React.
   const [status, setStatus] = useState<FlappyStatus>("ready");
   const [hearts, setHearts] = useState(MAX_HEARTS);
@@ -59,6 +66,11 @@ export function useFlappyEngine() {
   const backNodeRef = useRef<SVGGElement | null>(null);
   const midNodeRef = useRef<SVGGElement | null>(null);
   const groundNodeRef = useRef<SVGGElement | null>(null);
+
+  const onWinRef = useRef(onWin);
+  useEffect(() => {
+    onWinRef.current = onWin;
+  }, [onWin]);
 
   const changeStatus = useCallback((next: FlappyStatus) => {
     statusRef.current = next;
@@ -159,8 +171,14 @@ export function useFlappyEngine() {
           passedRef.current += 1;
           setPassed(passedRef.current);
           if (passedRef.current >= GOAL_LAMPS) {
-            setSeconds(Math.floor(timeRef.current));
+            const seconds = Math.floor(timeRef.current);
+            setSeconds(seconds);
             changeStatus("won");
+            onWinRef.current?.({
+              stars: starsRef.current,
+              hearts: heartsRef.current,
+              seconds,
+            });
             return;
           }
         }

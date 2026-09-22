@@ -6,7 +6,9 @@ import DragLayer from "@/components/DragLayer";
 import PuzzleBoard from "@/components/PuzzleBoard";
 import PuzzleTray from "@/components/PuzzleTray";
 import WinOverlay from "@/components/WinOverlay";
+import { useProgress } from "@/hooks/useProgress";
 import { usePointerDrag } from "@/hooks/usePointerDrag";
+import type { AchievementId } from "@/lib/progress";
 import {
   createPieces,
   formatTime,
@@ -27,9 +29,16 @@ type Props = {
   onNextGame: () => void;
   /** Atajo directo al nivel 3. */
   onSkipToWordSearch: () => void;
+  /** Vuelve a la portada. */
+  onHome: () => void;
 };
 
-export default function PuzzleGame({ onNextGame, onSkipToWordSearch }: Props) {
+export default function PuzzleGame({
+  onNextGame,
+  onSkipToWordSearch,
+  onHome,
+}: Props) {
+  const { unlock } = useProgress();
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [tray, setTray] = useState<Piece[]>([]);
   const [placed, setPlaced] = useState<(number | null)[]>([]);
@@ -107,11 +116,25 @@ export default function PuzzleGame({ onNextGame, onSkipToWordSearch }: Props) {
         setJustPlaced(slotIndex);
         if (placedTimer.current) clearTimeout(placedTimer.current);
         placedTimer.current = setTimeout(() => setJustPlaced(null), 400);
+
+        // Si solo faltaba este hueco, el rompecabezas quedó terminado.
+        const wasLastPiece =
+          placed.filter((slot) => slot === null).length === 1;
+        if (wasLastPiece && difficulty) {
+          const seconds =
+            startedAt === null
+              ? Number.POSITIVE_INFINITY
+              : Math.floor((Date.now() - startedAt) / 1000);
+          const earned: AchievementId[] = ["puzzle-first"];
+          if (difficulty.cols >= 5) earned.push("puzzle-hard");
+          if (difficulty.cols <= 3 && seconds < 60) earned.push("puzzle-fast");
+          unlock(...earned);
+        }
       } else {
         flashWrong(slotIndex);
       }
     },
-    [placed, flashWrong],
+    [placed, flashWrong, difficulty, startedAt, unlock],
   );
 
   const handleDrop = useCallback(
@@ -147,6 +170,7 @@ export default function PuzzleGame({ onNextGame, onSkipToWordSearch }: Props) {
         onStart={startLevel}
         onSkipToFlappy={onNextGame}
         onSkipToWordSearch={onSkipToWordSearch}
+        onHome={onHome}
       />
     );
   }

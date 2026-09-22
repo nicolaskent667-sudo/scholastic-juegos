@@ -126,3 +126,12 @@ body[data-dragging="true"] {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Lo mismo, pero elegido a mano desde Opciones. */
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

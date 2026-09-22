@@ -7,6 +7,7 @@ import WordList from "@/components/wordsearch/WordList";
 import WordSearchWin from "@/components/wordsearch/WordSearchWin";
 import WorldPicker from "@/components/wordsearch/WorldPicker";
 import { toolButton } from "@/components/ui/buttons";
+import { useProgress } from "@/hooks/useProgress";
 import { useCellSelection } from "@/hooks/useCellSelection";
 import { formatTime } from "@/lib/puzzle";
 import {
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export default function WordSearchGame({ onBack }: Props) {
+  const { progress, unlock, markWorldDone } = useProgress();
   const [world, setWorld] = useState<World | null>(null);
   const [board, setBoard] = useState<Board | null>(null);
   const [found, setFound] = useState<Placement[]>([]);
@@ -35,7 +37,6 @@ export default function WordSearchGame({ onBack }: Props) {
   const [hintCell, setHintCell] = useState<Cell | null>(null);
   const [shake, setShake] = useState(false);
   const [message, setMessage] = useState(IDLE_MESSAGE);
-  const [completed, setCompleted] = useState<number[]>([]);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [now, setNow] = useState(0);
 
@@ -109,12 +110,11 @@ export default function WordSearchGame({ onBack }: Props) {
       say(nextFound.length === board.placements.length ? "¡Lo lograste!" : "¡Muy bien!");
 
       if (nextFound.length === board.placements.length && world) {
-        setCompleted((prev) =>
-          prev.includes(world.id) ? prev : [...prev, world.id],
-        );
+        markWorldDone(world.id, WORLDS.length);
+        if (hintsUsed === 0) unlock("words-nohint");
       }
     },
-    [board, found, won, world, say],
+    [board, found, won, world, say, hintsUsed, markWorldDone, unlock],
   );
 
   const { active, anchor, startDrag, tapCell, clear } =
@@ -152,7 +152,11 @@ export default function WordSearchGame({ onBack }: Props) {
 
   if (!world || !board) {
     return (
-      <WorldPicker onPick={startWorld} onBack={onBack} completed={completed} />
+      <WorldPicker
+        onPick={startWorld}
+        onBack={onBack}
+        completed={progress.worldsDone}
+      />
     );
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
+import { useProgress } from "@/hooks/useProgress";
 import FlappyScene from "@/components/flappy/FlappyScene";
 import {
   FlappyWinOverlay,
@@ -8,7 +9,7 @@ import {
   PausedOverlay,
   ReadyOverlay,
 } from "@/components/flappy/FlappyOverlays";
-import { useFlappyEngine } from "@/hooks/useFlappyEngine";
+import { useFlappyEngine, type FlappyOutcome } from "@/hooks/useFlappyEngine";
 import { GOAL_LAMPS, MAX_HEARTS, WORLD } from "@/lib/flappy";
 
 const LEVEL_LABEL = "NIVEL 2";
@@ -34,6 +35,17 @@ type Props = {
 };
 
 export default function FlappyGame({ onBack, onNextGame }: Props) {
+  const { unlock, addStars } = useProgress();
+
+  const handleWin = useCallback(
+    ({ stars, hearts }: FlappyOutcome) => {
+      addStars(stars);
+      unlock("flappy-win");
+      if (hearts === MAX_HEARTS) unlock("flappy-perfect");
+    },
+    [addStars, unlock],
+  );
+
   const {
     status,
     hearts,
@@ -45,7 +57,7 @@ export default function FlappyGame({ onBack, onNextGame }: Props) {
     reset,
     togglePause,
     nodes,
-  } = useFlappyEngine();
+  } = useFlappyEngine(handleWin);
 
   const restart = useCallback(() => {
     reset();
