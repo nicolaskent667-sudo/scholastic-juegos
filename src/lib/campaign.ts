@@ -5,14 +5,15 @@
 
 import type { MemoLevelId } from "@/lib/memo";
 
-export type GameKind = "puzzle" | "flappy" | "wordsearch" | "memo";
+export type GameKind = "puzzle" | "flappy" | "wordsearch" | "memo" | "flow";
 
 /** Cómo se configura el minijuego cuando se entra desde el mapa. */
 export type LevelConfig =
   | { kind: "puzzle"; rows: number; cols: number }
   | { kind: "flappy"; lamps: number; speed: number }
   | { kind: "wordsearch"; worldId: number }
-  | { kind: "memo"; levelId: MemoLevelId; pairs: number };
+  | { kind: "memo"; levelId: MemoLevelId; pairs: number }
+  | { kind: "flow"; levelId: number };
 
 export type CampaignLevel = {
   /** Único en toda la campaña: "2-4". */
@@ -112,6 +113,23 @@ export const WORLDS: CampaignWorld[] = [
       { label: "10 parejas", config: { kind: "memo", levelId: "experto", pairs: 10 } },
     ]),
   },
+  {
+    id: 5,
+    name: "Unir colores",
+    hint: "Conectá los tubos y llená el tablero",
+    emoji: "🎨",
+    kind: "flow",
+    levels: makeLevels(5, [
+      { label: "5 × 5 · 4 tubos", config: { kind: "flow", levelId: 1 } },
+      { label: "5 × 5 · 5 tubos", config: { kind: "flow", levelId: 2 } },
+      { label: "6 × 6 · 5 tubos", config: { kind: "flow", levelId: 3 } },
+      { label: "6 × 6 · 6 tubos", config: { kind: "flow", levelId: 4 } },
+      { label: "6 × 6 · 6 tubos", config: { kind: "flow", levelId: 5 } },
+      { label: "7 × 7 · 6 tubos", config: { kind: "flow", levelId: 6 } },
+      { label: "7 × 7 · 7 tubos", config: { kind: "flow", levelId: 7 } },
+      { label: "7 × 7 · 7 tubos", config: { kind: "flow", levelId: 8 } },
+    ]),
+  },
 ];
 
 export const ALL_LEVELS: CampaignLevel[] = WORLDS.flatMap((w) => w.levels);
@@ -133,7 +151,8 @@ export type LevelResult =
   | { kind: "puzzle"; moves: number; pieces: number }
   | { kind: "flappy"; hearts: number }
   | { kind: "wordsearch"; hints: number }
-  | { kind: "memo"; tries: number; pairs: number };
+  | { kind: "memo"; tries: number; pairs: number }
+  | { kind: "flow"; moves: number; pipes: number };
 
 /**
  * Una estrella por terminar; las otras dos por hacerlo bien.
@@ -157,6 +176,12 @@ export function starsFor(result: LevelResult): 1 | 2 | 3 {
       const errors = Math.max(0, result.tries - result.pairs);
       if (errors === 0) return 3;
       return errors <= 2 ? 2 : 1;
+    }
+    case "flow": {
+      // Lo ideal es un trazo por tubo; cada rehecho cuenta como movida extra.
+      const extra = Math.max(0, result.moves - result.pipes);
+      if (extra === 0) return 3;
+      return extra <= result.pipes ? 2 : 1;
     }
   }
 }

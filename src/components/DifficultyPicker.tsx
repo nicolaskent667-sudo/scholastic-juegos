@@ -9,6 +9,7 @@ type Props = {
   onSkipToFlappy: () => void;
   onSkipToWordSearch: () => void;
   onSkipToMemo: () => void;
+  onSkipToFlow: () => void;
   /** Vuelve a la portada. */
   onHome: () => void;
 };
@@ -18,6 +19,7 @@ export default function DifficultyPicker({
   onSkipToFlappy,
   onSkipToWordSearch,
   onSkipToMemo,
+  onSkipToFlow,
   onHome,
 }: Props) {
   return (
@@ -104,6 +106,13 @@ export default function DifficultyPicker({
             className="cursor-pointer rounded-full border-[3px] border-tinta/30 px-4 py-2 text-sm font-bold text-tinta/60 outline-none transition hover:border-tinta hover:bg-crema hover:text-tinta focus-visible:ring-4 focus-visible:ring-cielo-azul"
           >
             🃏 Memotest
+          </button>
+          <button
+            type="button"
+            onClick={onSkipToFlow}
+            className="cursor-pointer rounded-full border-[3px] border-tinta/30 px-4 py-2 text-sm font-bold text-tinta/60 outline-none transition hover:border-tinta hover:bg-crema hover:text-tinta focus-visible:ring-4 focus-visible:ring-cielo-azul"
+          >
+            🎨 Unir colores
           </button>
         </div>
       </div>

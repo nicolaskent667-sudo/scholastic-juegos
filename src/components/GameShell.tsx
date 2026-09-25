@@ -5,11 +5,13 @@ import CampaignPlayer from "@/components/map/CampaignPlayer";
 import LevelMap from "@/components/map/LevelMap";
 import WorldSelect from "@/components/map/WorldSelect";
 import FlappyGame from "@/components/flappy/FlappyGame";
+import FlowGame from "@/components/flow/FlowGame";
 import MemoGame from "@/components/memo/MemoGame";
 import PuzzleGame from "@/components/PuzzleGame";
 import StartScreen from "@/components/start/StartScreen";
 import WordSearchGame from "@/components/wordsearch/WordSearchGame";
 import type { CampaignLevel, CampaignWorld } from "@/lib/campaign";
+import { FLOW_LEVELS } from "@/lib/flow";
 
 /**
  * "campaign" es el recorrido del mapa; el resto son los juegos sueltos, a los
@@ -23,7 +25,8 @@ type Screen =
   | "puzzle"
   | "flappy"
   | "wordsearch"
-  | "memo";
+  | "memo"
+  | "flow";
 
 /** Único dueño de qué pantalla se ve. */
 export default function GameShell() {
@@ -37,6 +40,7 @@ export default function GameShell() {
   const goToFlappy = useCallback(() => setScreen("flappy"), []);
   const goToWordSearch = useCallback(() => setScreen("wordsearch"), []);
   const goToMemo = useCallback(() => setScreen("memo"), []);
+  const goToFlow = useCallback(() => setScreen("flow"), []);
 
   const pickWorld = useCallback((next: CampaignWorld) => {
     setWorld(next);
@@ -82,12 +86,17 @@ export default function GameShell() {
     case "memo":
       return <MemoGame onBack={goToWordSearch} />;
 
+    case "flow":
+      // En modo libre siempre arranca por el primero.
+      return <FlowGame level={FLOW_LEVELS[0]} onBack={goToPuzzle} />;
+
     case "puzzle":
       return (
         <PuzzleGame
           onNextGame={goToFlappy}
           onSkipToWordSearch={goToWordSearch}
           onSkipToMemo={goToMemo}
+          onSkipToFlow={goToFlow}
           onHome={goToStart}
         />
       );

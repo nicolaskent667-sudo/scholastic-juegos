@@ -2,11 +2,13 @@
 
 import { useCallback } from "react";
 import FlappyGame from "@/components/flappy/FlappyGame";
+import FlowGame from "@/components/flow/FlowGame";
 import MemoGame from "@/components/memo/MemoGame";
 import PuzzleGame from "@/components/PuzzleGame";
 import WordSearchGame from "@/components/wordsearch/WordSearchGame";
 import { useProgress } from "@/hooks/useProgress";
 import { starsFor, type CampaignLevel, type LevelResult } from "@/lib/campaign";
+import { findFlowLevel } from "@/lib/flow";
 
 type Props = {
   level: CampaignLevel;
@@ -82,5 +84,24 @@ export default function CampaignPlayer({ level, onExit }: Props) {
           }}
         />
       );
+
+    case "flow": {
+      const flowLevel = findFlowLevel(config.levelId);
+      if (!flowLevel) return null;
+      return (
+        <FlowGame
+          level={flowLevel}
+          onBack={onExit}
+          campaign={{
+            onFinish: (moves) =>
+              finish({
+                kind: "flow",
+                moves,
+                pipes: flowLevel.colors.length,
+              }),
+          }}
+        />
+      );
+    }
   }
 }

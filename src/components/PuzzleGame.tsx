@@ -39,6 +39,7 @@ type Props = {
   onNextGame?: () => void;
   onSkipToWordSearch?: () => void;
   onSkipToMemo?: () => void;
+  onSkipToFlow?: () => void;
   /** Vuelve a la portada, o al mapa si viene de la campaña. */
   onHome: () => void;
   campaign?: PuzzleCampaign;
@@ -48,6 +49,7 @@ export default function PuzzleGame({
   onNextGame,
   onSkipToWordSearch,
   onSkipToMemo,
+  onSkipToFlow,
   onHome,
   campaign,
 }: Props) {
@@ -218,6 +220,7 @@ export default function PuzzleGame({
         onSkipToFlappy={onNextGame ?? onHome}
         onSkipToWordSearch={onSkipToWordSearch ?? onHome}
         onSkipToMemo={onSkipToMemo ?? onHome}
+        onSkipToFlow={onSkipToFlow ?? onHome}
         onHome={onHome}
       />
     );

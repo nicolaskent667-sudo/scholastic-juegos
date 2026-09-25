@@ -6,6 +6,8 @@
 import type { MemoLevelId } from "@/lib/memo";
 
 export type AchievementId =
+  | "flow-first"
+  | "flow-nohint"
   | "memo-first"
   | "memo-expert"
   | "memo-perfect"
@@ -39,6 +41,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "memo-first", emoji: "🃏", name: "Buena memoria", how: "Completá un memotest" },
   { id: "memo-expert", emoji: "🎓", name: "Ojo de lince", how: "Completá el memotest experto" },
   { id: "memo-perfect", emoji: "✨", name: "Memoria perfecta", how: "Completá un memotest sin errar ni una" },
+  { id: "flow-first", emoji: "🎨", name: "Todo conectado", how: "Resolvé un tablero de unir colores" },
+  { id: "flow-nohint", emoji: "🧵", name: "Sin mirar la pista", how: "Resolvé un tablero de unir colores sin pistas" },
 ];
 
 export const STARS_GOAL = 30;
