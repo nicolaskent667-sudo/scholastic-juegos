@@ -5,7 +5,9 @@ import MemoCard from "@/components/memo/MemoCard";
 import MemoLevelPicker from "@/components/memo/MemoLevelPicker";
 import MemoWin from "@/components/memo/MemoWin";
 import { toolButton } from "@/components/ui/buttons";
+import { useGameMusic } from "@/hooks/useGameMusic";
 import { useProgress } from "@/hooks/useProgress";
+import { playEffect } from "@/lib/audio";
 import {
   MEMO_LEVELS,
   buildDeck,
@@ -33,6 +35,7 @@ type Props = {
 
 export default function MemoGame({ onBack, campaign }: Props) {
   const { progress, recordMemoResult } = useProgress();
+  useGameMusic();
 
   /**
    * En modo campaña se entra directo al nivel, con la cantidad de parejas que
@@ -130,10 +133,12 @@ export default function MemoGame({ onBack, campaign }: Props) {
 
       if (first && second && first.card.id === second.card.id) {
         const nextMatched = [...matched, first.card.id];
+        const isLastPair = nextMatched.length === level.pairs;
+        playEffect(isLastPair ? "victoria" : "bloque");
         setMatched(nextMatched);
         setPicked([]);
 
-        if (nextMatched.length === level.pairs) {
+        if (isLastPair) {
           const seconds = startedAt
             ? Math.max(0, Math.floor((Date.now() - startedAt) / 1000))
             : 0;

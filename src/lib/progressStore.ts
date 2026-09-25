@@ -21,6 +21,7 @@ import {
   type Settings,
 } from "@/lib/progress";
 import type { MemoLevelId } from "@/lib/memo";
+import { setAudioEnabled } from "@/lib/audio";
 
 export type Snapshot = {
   progress: Progress;
@@ -53,6 +54,7 @@ function setSnapshot(progress: Progress, persist: boolean): void {
   snapshot = { progress, loaded: true };
   if (persist) saveProgress(progress);
   applyMotionSetting(progress);
+  setAudioEnabled(progress.settings.sound);
   for (const listener of listeners) listener();
 }
 
@@ -70,6 +72,7 @@ export function subscribe(listener: () => void): () => void {
     const stored = loadProgress();
     snapshot = { progress: stored, loaded: true };
     applyMotionSetting(stored);
+    setAudioEnabled(stored.settings.sound);
   }
 
   if (listeners.size === 0) {

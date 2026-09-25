@@ -9,6 +9,8 @@ import WorldPicker from "@/components/wordsearch/WorldPicker";
 import { toolButton } from "@/components/ui/buttons";
 import { useProgress } from "@/hooks/useProgress";
 import { useCellSelection } from "@/hooks/useCellSelection";
+import { useGameMusic } from "@/hooks/useGameMusic";
+import { playEffect } from "@/lib/audio";
 import { formatTime } from "@/lib/puzzle";
 import {
   WORLDS,
@@ -43,6 +45,7 @@ export default function WordSearchGame({
   campaign,
 }: Props) {
   const { progress, unlock, markWorldDone } = useProgress();
+  useGameMusic();
 
   /**
    * En modo campaña el mundo arranca abierto. El tablero se genera una sola vez
@@ -133,6 +136,8 @@ export default function WordSearchGame({
 
       const placement = board.placements.find((p) => p.word === hit)!;
       const nextFound = [...found, placement];
+      const isLastWord = nextFound.length === board.placements.length;
+      playEffect(isLastWord ? "victoria" : "bloque");
       setFound(nextFound);
       setHintCell(null);
       say(nextFound.length === board.placements.length ? "¡Lo lograste!" : "¡Muy bien!");

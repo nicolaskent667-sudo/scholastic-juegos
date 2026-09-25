@@ -46,6 +46,8 @@ export const STARS_GOAL = 30;
 export type Settings = {
   /** Apaga las animaciones decorativas para quien se marea o se distrae. */
   reducedMotion: boolean;
+  /** Música de fondo y efectos. */
+  sound: boolean;
 };
 
 /** Mejor marca de un nivel de memotest: menos intentos primero. */
@@ -70,7 +72,7 @@ export const DEFAULT_PROGRESS: Progress = {
   worldsDone: [],
   memoBest: {},
   levelStars: {},
-  settings: { reducedMotion: false },
+  settings: { reducedMotion: false, sound: true },
 };
 
 const MEMO_LEVEL_IDS = new Set<string>(["facil", "dificil", "experto"]);
@@ -149,7 +151,11 @@ function sanitize(raw: unknown): Progress {
     worldsDone: [...new Set(worldsDone)],
     memoBest,
     levelStars,
-    settings: { reducedMotion: settings.reducedMotion === true },
+    settings: {
+      reducedMotion: settings.reducedMotion === true,
+      // El sonido viene prendido salvo que se haya apagado a propósito.
+      sound: settings.sound !== false,
+    },
   };
 }
 

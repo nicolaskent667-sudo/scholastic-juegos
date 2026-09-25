@@ -40,6 +40,23 @@ export default function OptionsPanel({ onClose }: Props) {
         <label className="mt-5 flex cursor-pointer items-center justify-between gap-4 rounded-2xl border-[3px] border-tinta bg-white px-4 py-3">
           <span>
             <span className="block font-extrabold text-tinta">
+              Sonido
+            </span>
+            <span className="block text-sm font-bold text-tinta/60">
+              Música de fondo y efectos de los juegos
+            </span>
+          </span>
+          <input
+            type="checkbox"
+            checked={progress.settings.sound}
+            onChange={(event) => setSettings({ sound: event.target.checked })}
+            className="h-7 w-7 shrink-0 cursor-pointer accent-berry"
+          />
+        </label>
+
+        <label className="mt-3 flex cursor-pointer items-center justify-between gap-4 rounded-2xl border-[3px] border-tinta bg-white px-4 py-3">
+          <span>
+            <span className="block font-extrabold text-tinta">
               Menos animaciones
             </span>
             <span className="block text-sm font-bold text-tinta/60">
@@ -92,10 +109,6 @@ export default function OptionsPanel({ onClose }: Props) {
             </button>
           )}
         </div>
-
-        <p className="mt-4 text-center text-xs font-bold text-tinta/45">
-          Todavía no hay sonidos en el juego, así que no hay nada que silenciar.
-        </p>
 
         <button
           ref={closeRef}

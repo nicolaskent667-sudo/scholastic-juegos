@@ -6,8 +6,10 @@ import DragLayer from "@/components/DragLayer";
 import PuzzleBoard from "@/components/PuzzleBoard";
 import PuzzleTray from "@/components/PuzzleTray";
 import WinOverlay from "@/components/WinOverlay";
+import { useGameMusic } from "@/hooks/useGameMusic";
 import { useProgress } from "@/hooks/useProgress";
 import { usePointerDrag } from "@/hooks/usePointerDrag";
+import { playEffect } from "@/lib/audio";
 import type { AchievementId } from "@/lib/progress";
 import {
   createPieces,
@@ -50,6 +52,7 @@ export default function PuzzleGame({
   campaign,
 }: Props) {
   const { unlock } = useProgress();
+  useGameMusic();
 
   /**
    * En modo campaña el nivel arranca armado, sin pasar por el selector.
@@ -159,6 +162,9 @@ export default function PuzzleGame({
         // Si solo faltaba este hueco, el rompecabezas quedó terminado.
         const wasLastPiece =
           placed.filter((slot) => slot === null).length === 1;
+        // La última pieza va con el sonido de victoria, no con el de encastre.
+        playEffect(wasLastPiece ? "victoria" : "bloque");
+
         if (wasLastPiece && difficulty) {
           const seconds =
             startedAt === null
