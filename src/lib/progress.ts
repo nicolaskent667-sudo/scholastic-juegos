@@ -59,6 +59,8 @@ export type Progress = {
   /** Mundos de la sopa de letras ya completados. */
   worldsDone: number[];
   memoBest: MemoBest;
+  /** Estrellas (1-3) por nivel de la campaña, indexadas por su id. */
+  levelStars: Record<string, number>;
   settings: Settings;
 };
 
@@ -67,6 +69,7 @@ export const DEFAULT_PROGRESS: Progress = {
   stars: 0,
   worldsDone: [],
   memoBest: {},
+  levelStars: {},
   settings: { reducedMotion: false },
 };
 
@@ -131,11 +134,21 @@ function sanitize(raw: unknown): Progress {
     }
   }
 
+  const levelStars: Record<string, number> = {};
+  if (typeof data.levelStars === "object" && data.levelStars !== null) {
+    for (const [id, value] of Object.entries(data.levelStars)) {
+      if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+        levelStars[id] = Math.min(3, Math.max(1, Math.floor(value)));
+      }
+    }
+  }
+
   return {
     unlocked: [...new Set(unlocked)],
     stars,
     worldsDone: [...new Set(worldsDone)],
     memoBest,
+    levelStars,
     settings: { reducedMotion: settings.reducedMotion === true },
   };
 }

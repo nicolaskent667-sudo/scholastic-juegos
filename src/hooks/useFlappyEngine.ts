@@ -32,12 +32,24 @@ const MAX_FRAME_DELTA = 0.05;
 
 export type FlappyOutcome = { stars: number; hearts: number; seconds: number };
 
+export type FlappyOptions = {
+  /** Faroles a cruzar para ganar. El mapa lo fija por nivel. */
+  goalLamps?: number;
+  /** Velocidad inicial de scroll. */
+  baseSpeed?: number;
+};
+
 /**
  * `onWin` se dispara dentro del bucle, en el momento exacto en que se cruza el
  * último farol. Se avisa así, y no con un efecto sobre `status`, para no meter
  * un setState en el cuerpo de un efecto.
  */
-export function useFlappyEngine(onWin?: (outcome: FlappyOutcome) => void) {
+export function useFlappyEngine(
+  onWin?: (outcome: FlappyOutcome) => void,
+  options: FlappyOptions = {},
+) {
+  const goalLamps = options.goalLamps ?? GOAL_LAMPS;
+  const baseSpeed = options.baseSpeed ?? PHYSICS.baseSpeed;
   // --- Estado que se muestra en el HUD: cambia poco, vive en React.
   const [status, setStatus] = useState<FlappyStatus>("ready");
   const [hearts, setHearts] = useState(MAX_HEARTS);
@@ -71,6 +83,12 @@ export function useFlappyEngine(onWin?: (outcome: FlappyOutcome) => void) {
   useEffect(() => {
     onWinRef.current = onWin;
   }, [onWin]);
+
+  // El bucle lee la config por ref: cambiarla no debe reiniciar el rAF.
+  const configRef = useRef({ goalLamps, baseSpeed });
+  useEffect(() => {
+    configRef.current = { goalLamps, baseSpeed };
+  }, [goalLamps, baseSpeed]);
 
   const changeStatus = useCallback((next: FlappyStatus) => {
     statusRef.current = next;
@@ -147,7 +165,7 @@ export function useFlappyEngine(onWin?: (outcome: FlappyOutcome) => void) {
       bird.vy = Math.min(PHYSICS.maxFallSpeed, bird.vy + PHYSICS.gravity * dt);
       bird.y += bird.vy * dt;
 
-      const speed = speedFor(passedRef.current);
+      const speed = speedFor(passedRef.current, configRef.current.baseSpeed);
       const shift = speed * dt;
       const offsets = offsetsRef.current;
       offsets.back += shift * LAYER_SPEED.back;
@@ -170,7 +188,7 @@ export function useFlappyEngine(onWin?: (outcome: FlappyOutcome) => void) {
           lamp.passed = true;
           passedRef.current += 1;
           setPassed(passedRef.current);
-          if (passedRef.current >= GOAL_LAMPS) {
+          if (passedRef.current >= configRef.current.goalLamps) {
             const seconds = Math.floor(timeRef.current);
             setSeconds(seconds);
             changeStatus("won");
@@ -331,7 +349,8 @@ export function useFlappyEngine(onWin?: (outcome: FlappyOutcome) => void) {
     stars,
     passed,
     seconds,
-    progress: clamp(passed / GOAL_LAMPS, 0, 1),
+    goalLamps,
+    progress: clamp(passed / goalLamps, 0, 1),
     flap,
     reset,
     togglePause,

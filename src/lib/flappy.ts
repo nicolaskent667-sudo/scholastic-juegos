@@ -172,10 +172,15 @@ export function starCollected(birdY: number, lamp: LampState): boolean {
 }
 
 /** Velocidad de scroll según cuántos faroles se pasaron. */
-export function speedFor(passed: number): number {
+export function speedFor(
+  passed: number,
+  // Anotado explícitamente: PHYSICS es `as const`, así que sin esto el tipo
+  // del parámetro quedaría en el literal 210 y no aceptaría otra velocidad.
+  baseSpeed: number = PHYSICS.baseSpeed,
+): number {
   return Math.min(
     PHYSICS.maxSpeed,
-    PHYSICS.baseSpeed + passed * PHYSICS.speedPerLamp,
+    baseSpeed + passed * PHYSICS.speedPerLamp,
   );
 }
 

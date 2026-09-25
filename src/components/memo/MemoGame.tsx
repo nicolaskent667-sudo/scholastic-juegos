@@ -6,29 +6,58 @@ import MemoLevelPicker from "@/components/memo/MemoLevelPicker";
 import MemoWin from "@/components/memo/MemoWin";
 import { toolButton } from "@/components/ui/buttons";
 import { useProgress } from "@/hooks/useProgress";
-import { MEMO_LEVELS, buildDeck, type MemoLevel, type MemoTile } from "@/lib/memo";
+import {
+  MEMO_LEVELS,
+  buildDeck,
+  type MemoLevel,
+  type MemoLevelId,
+  type MemoTile,
+} from "@/lib/memo";
 import { isBetterRecord, type MemoRecord } from "@/lib/progress";
 import { formatTime } from "@/lib/puzzle";
 
 /** Cuánto quedan visibles dos cartas que no coinciden. */
 const PEEK_MS = 900;
 
-type Props = {
-  onBack: () => void;
+export type MemoCampaign = {
+  levelId: MemoLevelId;
+  pairs: number;
+  /** Se llama al completar, con los intentos usados. */
+  onFinish: (tries: number) => void;
 };
 
-export default function MemoGame({ onBack }: Props) {
+type Props = {
+  onBack: () => void;
+  campaign?: MemoCampaign;
+};
+
+export default function MemoGame({ onBack, campaign }: Props) {
   const { progress, recordMemoResult } = useProgress();
 
-  const [level, setLevel] = useState<MemoLevel | null>(null);
-  const [deck, setDeck] = useState<MemoTile[]>([]);
+  /**
+   * En modo campaña se entra directo al nivel, con la cantidad de parejas que
+   * pide el mapa. El reparto va en un initializer perezoso: este subárbol nunca
+   * se renderiza en el servidor, así que el Math.random no rompe la hidratación.
+   */
+  const [seed] = useState(() => {
+    if (!campaign) return null;
+    const base = MEMO_LEVELS.find((l) => l.id === campaign.levelId);
+    if (!base) return null;
+    const tuned: MemoLevel = { ...base, pairs: campaign.pairs };
+    return { level: tuned, deck: buildDeck(tuned), startedAt: Date.now() };
+  });
+
+  const [level, setLevel] = useState<MemoLevel | null>(seed?.level ?? null);
+  const [deck, setDeck] = useState<MemoTile[]>(seed?.deck ?? []);
   /** Claves de las cartas levantadas ahora mismo (0, 1 o 2). */
   const [picked, setPicked] = useState<string[]>([]);
   const [matched, setMatched] = useState<string[]>([]);
   const [wrong, setWrong] = useState<string[]>([]);
   const [tries, setTries] = useState(0);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [now, setNow] = useState(0);
+  const [startedAt, setStartedAt] = useState<number | null>(
+    seed?.startedAt ?? null,
+  );
+  const [now, setNow] = useState(seed?.startedAt ?? 0);
   /** Se congela al ganar para que el cartel muestre la marca correcta. */
   const [result, setResult] = useState<MemoRecord | null>(null);
   /**
@@ -112,6 +141,7 @@ export default function MemoGame({ onBack }: Props) {
           setResult(record);
           // Perfecto = un intento por pareja, sin un solo error.
           recordMemoResult(level.id, record, attempt === level.pairs);
+          campaign?.onFinish(attempt);
         }
         return;
       }
@@ -124,16 +154,21 @@ export default function MemoGame({ onBack }: Props) {
         setWrong([]);
       }, PEEK_MS);
     },
-    [level, won, picked, matched, deck, tries, startedAt, recordMemoResult],
+    [level, won, picked, matched, deck, tries, startedAt, recordMemoResult, campaign],
   );
 
   const backToLevels = useCallback(() => {
     if (peekTimer.current) clearTimeout(peekTimer.current);
+    // En la campaña no hay selector de niveles: se vuelve al mapa.
+    if (campaign) {
+      onBack();
+      return;
+    }
     setLevel(null);
     setDeck([]);
     setStartedAt(null);
     setResult(null);
-  }, []);
+  }, [campaign, onBack]);
 
   const nextLevel = useCallback(() => {
     if (!level) return;
@@ -243,7 +278,8 @@ export default function MemoGame({ onBack }: Props) {
           pairs={level.pairs}
           previousBest={bestAtStart}
           isNewBest={isBetterRecord(result, bestAtStart)}
-          hasNextLevel={hasNextLevel}
+          hasNextLevel={hasNextLevel && !campaign}
+          campaignMode={campaign !== undefined}
           onNextLevel={nextLevel}
           onReplay={() => beginLevel(level)}
           onLevels={backToLevels}

@@ -10,9 +10,9 @@ import {
   ReadyOverlay,
 } from "@/components/flappy/FlappyOverlays";
 import { useFlappyEngine, type FlappyOutcome } from "@/hooks/useFlappyEngine";
-import { GOAL_LAMPS, MAX_HEARTS, WORLD } from "@/lib/flappy";
+import { MAX_HEARTS, WORLD } from "@/lib/flappy";
 
-const LEVEL_LABEL = "NIVEL 2";
+
 
 function Heart({ filled }: { filled: boolean }) {
   return (
@@ -28,13 +28,23 @@ function Heart({ filled }: { filled: boolean }) {
   );
 }
 
-type Props = {
-  onBack: () => void;
-  /** Lleva a la sopa de letras. */
-  onNextGame: () => void;
+export type FlappyCampaign = {
+  /** Rótulo que reemplaza al badge "NIVEL 2" del HUD. */
+  label: string;
+  lamps: number;
+  speed: number;
+  /** Se llama al ganar, con los corazones que quedaron. */
+  onFinish: (hearts: number) => void;
 };
 
-export default function FlappyGame({ onBack, onNextGame }: Props) {
+type Props = {
+  onBack: () => void;
+  /** Lleva a la sopa de letras. Solo en el modo libre. */
+  onNextGame?: () => void;
+  campaign?: FlappyCampaign;
+};
+
+export default function FlappyGame({ onBack, onNextGame, campaign }: Props) {
   const { unlock, addStars } = useProgress();
 
   const handleWin = useCallback(
@@ -42,8 +52,9 @@ export default function FlappyGame({ onBack, onNextGame }: Props) {
       addStars(stars);
       unlock("flappy-win");
       if (hearts === MAX_HEARTS) unlock("flappy-perfect");
+      campaign?.onFinish(hearts);
     },
-    [addStars, unlock],
+    [addStars, unlock, campaign],
   );
 
   const {
@@ -53,16 +64,22 @@ export default function FlappyGame({ onBack, onNextGame }: Props) {
     passed,
     seconds,
     progress,
+    goalLamps,
     flap,
     reset,
     togglePause,
     nodes,
-  } = useFlappyEngine(handleWin);
+  } = useFlappyEngine(handleWin, {
+    goalLamps: campaign?.lamps,
+    baseSpeed: campaign?.speed,
+  });
 
   const restart = useCallback(() => {
     reset();
     // `reset` deja el juego en "ready": el primer toque vuelve a arrancar.
   }, [reset]);
+
+  const backLabel = campaign ? "← Volver al mapa" : "← Rompecabezas";
 
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -110,7 +127,7 @@ export default function FlappyGame({ onBack, onNextGame }: Props) {
                 </span>
               </div>
               <span className="rounded-full border-[3px] border-tinta bg-berry px-3 py-1 text-sm font-extrabold tracking-wide text-white sm:px-4 sm:text-base">
-                {LEVEL_LABEL}
+                {campaign ? campaign.label : "NIVEL 2"}
               </span>
             </div>
 
@@ -142,7 +159,7 @@ export default function FlappyGame({ onBack, onNextGame }: Props) {
             />
           </div>
           <p className="mt-1 text-center text-xs font-bold text-tinta/70">
-            {passed} / {GOAL_LAMPS} faroles
+            {passed} / {goalLamps} faroles
           </p>
         </div>
 
@@ -152,14 +169,17 @@ export default function FlappyGame({ onBack, onNextGame }: Props) {
             onResume={togglePause}
             onRestart={restart}
             onBack={onBack}
+            backLabel={backLabel}
           />
         )}
         {status === "over" && (
           <GameOverOverlay
             stars={stars}
             passed={passed}
+            goal={goalLamps}
             onRestart={restart}
             onBack={onBack}
+            backLabel={backLabel}
           />
         )}
         {status === "won" && (
@@ -167,9 +187,11 @@ export default function FlappyGame({ onBack, onNextGame }: Props) {
             stars={stars}
             hearts={hearts}
             seconds={seconds}
+            goal={goalLamps}
             onRestart={restart}
             onBack={onBack}
             onNextGame={onNextGame}
+            backLabel={backLabel}
           />
         )}
       </div>
@@ -180,7 +202,7 @@ export default function FlappyGame({ onBack, onNextGame }: Props) {
           onClick={onBack}
           className="cursor-pointer rounded-2xl border-[3px] border-tinta bg-crema px-4 py-2 font-extrabold text-tinta shadow-[0_4px_0_rgba(90,42,51,0.3)] outline-none transition hover:-translate-y-0.5 hover:bg-blush/50 focus-visible:ring-4 focus-visible:ring-cielo-azul active:translate-y-1 active:shadow-none"
         >
-          ← Rompecabezas
+          {backLabel}
         </button>
         <p className="text-sm font-bold text-tinta/60">
           Tocá la pantalla o apretá la barra espaciadora para aletear

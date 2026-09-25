@@ -27,10 +27,11 @@ type Props = {
   seconds: number;
   hintsUsed: number;
   hasNextWorld: boolean;
+  /** En la campaña no hay "siguiente juego": se vuelve al mapa. */
+  campaignMode: boolean;
   onNextWorld: () => void;
   onReplay: () => void;
   onWorlds: () => void;
-  /** Lleva al memotest. */
   onNextGame: () => void;
 };
 
@@ -49,6 +50,7 @@ export default function WordSearchWin({
   seconds,
   hintsUsed,
   hasNextWorld,
+  campaignMode,
   onNextWorld,
   onReplay,
   onWorlds,
@@ -116,11 +118,13 @@ export default function WordSearchWin({
           >
             Jugar de nuevo
           </button>
-          <button type="button" onClick={onNextGame} className={secondaryButton}>
-            Siguiente juego →
-          </button>
+          {!campaignMode && (
+            <button type="button" onClick={onNextGame} className={secondaryButton}>
+              Siguiente juego →
+            </button>
+          )}
           <button type="button" onClick={onWorlds} className={secondaryButton}>
-            ← Elegir mundo
+            {campaignMode ? "← Volver al mapa" : "← Elegir mundo"}
           </button>
         </div>
       </div>

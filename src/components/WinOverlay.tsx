@@ -7,6 +7,9 @@ import { ASPECT, formatTime, PUZZLE } from "@/lib/puzzle";
 type Props = {
   seconds: number;
   moves: number;
+  pieces: number;
+  /** En la campaña el botón principal vuelve al mapa. */
+  campaignMode: boolean;
   onReplay: () => void;
   onChangeDifficulty: () => void;
   onNextGame: () => void;
@@ -32,6 +35,8 @@ const CONFETTI = Array.from({ length: 28 }, (_, i) => ({
 export default function WinOverlay({
   seconds,
   moves,
+  pieces,
+  campaignMode,
   onReplay,
   onChangeDifficulty,
   onNextGame,
@@ -105,8 +110,15 @@ export default function WinOverlay({
           onClick={onNextGame}
           className="mt-5 w-full cursor-pointer rounded-2xl border-[3px] border-tinta bg-sol px-4 py-3 text-xl font-extrabold text-tinta shadow-[0_5px_0_rgba(90,42,51,0.3)] outline-none transition hover:-translate-y-0.5 focus-visible:ring-4 focus-visible:ring-cielo-azul active:translate-y-1 active:shadow-none"
         >
-          Siguiente juego →
+          {campaignMode ? "← Volver al mapa" : "Siguiente juego →"}
         </button>
+
+        {moves > pieces && (
+          <p className="mt-2 text-sm font-bold text-tinta/55">
+            {moves - pieces} {moves - pieces === 1 ? "pieza" : "piezas"} fuera de
+            lugar
+          </p>
+        )}
 
         <div className="mt-3 flex flex-col gap-3 sm:flex-row">
           <button
@@ -121,7 +133,7 @@ export default function WinOverlay({
             onClick={onChangeDifficulty}
             className="flex-1 cursor-pointer rounded-2xl border-[3px] border-tinta bg-crema px-4 py-3 font-extrabold text-tinta shadow-[0_5px_0_rgba(90,42,51,0.3)] outline-none transition hover:-translate-y-0.5 hover:bg-blush/50 focus-visible:ring-4 focus-visible:ring-cielo-azul active:translate-y-1 active:shadow-none"
           >
-            Cambiar nivel
+            {campaignMode ? "← Mapa" : "Cambiar nivel"}
           </button>
         </div>
       </div>

@@ -150,6 +150,15 @@ export function recordMemoResult(
   });
 }
 
+/** Guarda las estrellas de un nivel del mapa, sin bajar una marca anterior. */
+export function recordLevelStars(levelId: string, stars: number): void {
+  update((prev) => {
+    const current = prev.levelStars[levelId] ?? 0;
+    if (stars <= current) return prev;
+    return { ...prev, levelStars: { ...prev.levelStars, [levelId]: stars } };
+  });
+}
+
 export function setSettings(patch: Partial<Settings>): void {
   update((prev) => ({ ...prev, settings: { ...prev.settings, ...patch } }));
 }

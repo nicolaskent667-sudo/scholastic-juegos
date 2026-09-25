@@ -24,23 +24,49 @@ import {
 const MAX_HINTS = 3;
 const IDLE_MESSAGE = "¿Dónde estarán?";
 
-type Props = {
-  onBack: () => void;
-  /** Lleva al memotest. */
-  onNextGame: () => void;
+export type WordSearchCampaign = {
+  worldId: number;
+  /** Se llama al completar, con las pistas usadas. */
+  onFinish: (hints: number) => void;
 };
 
-export default function WordSearchGame({ onBack, onNextGame }: Props) {
+type Props = {
+  onBack: () => void;
+  /** Lleva al memotest. Solo en el modo libre. */
+  onNextGame?: () => void;
+  campaign?: WordSearchCampaign;
+};
+
+export default function WordSearchGame({
+  onBack,
+  onNextGame,
+  campaign,
+}: Props) {
   const { progress, unlock, markWorldDone } = useProgress();
-  const [world, setWorld] = useState<World | null>(null);
-  const [board, setBoard] = useState<Board | null>(null);
+
+  /**
+   * En modo campaña el mundo arranca abierto. El tablero se genera una sola vez
+   * con el initializer perezoso: este subárbol nunca se renderiza en el
+   * servidor, así que el Math.random del generador no rompe la hidratación.
+   */
+  const [seed] = useState(() => {
+    if (!campaign) return null;
+    const target = WORLDS.find((w) => w.id === campaign.worldId);
+    if (!target) return null;
+    return { world: target, board: generateBoard(target), startedAt: Date.now() };
+  });
+
+  const [world, setWorld] = useState<World | null>(seed?.world ?? null);
+  const [board, setBoard] = useState<Board | null>(seed?.board ?? null);
   const [found, setFound] = useState<Placement[]>([]);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [hintCell, setHintCell] = useState<Cell | null>(null);
   const [shake, setShake] = useState(false);
   const [message, setMessage] = useState(IDLE_MESSAGE);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [now, setNow] = useState(0);
+  const [startedAt, setStartedAt] = useState<number | null>(
+    seed?.startedAt ?? null,
+  );
+  const [now, setNow] = useState(seed?.startedAt ?? 0);
 
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,9 +140,10 @@ export default function WordSearchGame({ onBack, onNextGame }: Props) {
       if (nextFound.length === board.placements.length && world) {
         markWorldDone(world.id, WORLDS.length);
         if (hintsUsed === 0) unlock("words-nohint");
+        campaign?.onFinish(hintsUsed);
       }
     },
-    [board, found, won, world, say, hintsUsed, markWorldDone, unlock],
+    [board, found, won, world, say, hintsUsed, markWorldDone, unlock, campaign],
   );
 
   const { active, anchor, startDrag, tapCell, clear } =
@@ -140,11 +167,16 @@ export default function WordSearchGame({ onBack, onNextGame }: Props) {
 
   const backToWorlds = useCallback(() => {
     clear();
+    // En la campaña no hay selector de mundos: se vuelve al mapa.
+    if (campaign) {
+      onBack();
+      return;
+    }
     setWorld(null);
     setBoard(null);
     setFound([]);
     setStartedAt(null);
-  }, [clear]);
+  }, [clear, campaign, onBack]);
 
   const nextWorld = useCallback(() => {
     if (!world) return;
@@ -235,8 +267,9 @@ export default function WordSearchGame({ onBack, onNextGame }: Props) {
           words={board.placements.length}
           seconds={elapsed}
           hintsUsed={hintsUsed}
-          hasNextWorld={hasNextWorld}
-          onNextGame={onNextGame}
+          hasNextWorld={hasNextWorld && !campaign}
+          campaignMode={campaign !== undefined}
+          onNextGame={onNextGame ?? onBack}
           onNextWorld={nextWorld}
           onReplay={() => startWorld(world)}
           onWorlds={backToWorlds}

@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { primaryButton, secondaryButton } from "@/components/ui/buttons";
 import { formatTime } from "@/lib/puzzle";
-import { GOAL_LAMPS } from "@/lib/flappy";
+
 
 const CONFETTI_COLORS = [
   "var(--color-blush)",
@@ -117,10 +117,12 @@ export function PausedOverlay({
   onResume,
   onRestart,
   onBack,
+  backLabel,
 }: {
   onResume: () => void;
   onRestart: () => void;
   onBack: () => void;
+  backLabel: string;
 }) {
   const focusRef = useRef<HTMLButtonElement>(null);
   return (
@@ -138,7 +140,7 @@ export function PausedOverlay({
           Empezar de nuevo
         </button>
         <button type="button" onClick={onBack} className={secondaryButton}>
-          ← Volver al rompecabezas
+          {backLabel}
         </button>
       </div>
     </Panel>
@@ -148,13 +150,17 @@ export function PausedOverlay({
 export function GameOverOverlay({
   stars,
   passed,
+  goal,
   onRestart,
   onBack,
+  backLabel,
 }: {
   stars: number;
   passed: number;
+  goal: number;
   onRestart: () => void;
   onBack: () => void;
+  backLabel: string;
 }) {
   const focusRef = useRef<HTMLButtonElement>(null);
   return (
@@ -164,7 +170,7 @@ export function GameOverOverlay({
       autoFocusRef={focusRef}
     >
       <dl className="mt-4 flex gap-3">
-        <Stat label="Faroles" value={`${passed}/${GOAL_LAMPS}`} tone="bg-menta/70" />
+        <Stat label="Faroles" value={`${passed}/${goal}`} tone="bg-menta/70" />
         <Stat label="Estrellas" value={`${stars}`} tone="bg-blush/50" />
       </dl>
       <div className="mt-5 flex flex-col gap-3">
@@ -177,7 +183,7 @@ export function GameOverOverlay({
           Intentar de nuevo
         </button>
         <button type="button" onClick={onBack} className={secondaryButton}>
-          ← Volver al rompecabezas
+          {backLabel}
         </button>
       </div>
     </Panel>
@@ -188,22 +194,27 @@ export function FlappyWinOverlay({
   stars,
   hearts,
   seconds,
+  goal,
   onRestart,
   onBack,
   onNextGame,
+  backLabel,
 }: {
   stars: number;
   hearts: number;
   seconds: number;
+  goal: number;
   onRestart: () => void;
   onBack: () => void;
-  onNextGame: () => void;
+  /** Ausente en el modo campaña: ahí se vuelve al mapa. */
+  onNextGame?: () => void;
+  backLabel: string;
 }) {
   const focusRef = useRef<HTMLButtonElement>(null);
   return (
     <Panel
       title="¡Lo lograste! 🎉"
-      subtitle={`Cruzaste los ${GOAL_LAMPS} faroles`}
+      subtitle={`Cruzaste los ${goal} faroles`}
       confetti
       autoFocusRef={focusRef}
     >
@@ -213,20 +224,33 @@ export function FlappyWinOverlay({
         <Stat label="Corazones" value={`${hearts}`} tone="bg-menta/70" />
       </dl>
       <div className="mt-5 flex flex-col gap-3">
-        <button
-          ref={focusRef}
-          type="button"
-          onClick={onNextGame}
-          className={primaryButton}
-        >
-          Siguiente juego →
-        </button>
+        {onNextGame ? (
+          <button
+            ref={focusRef}
+            type="button"
+            onClick={onNextGame}
+            className={primaryButton}
+          >
+            Siguiente juego →
+          </button>
+        ) : (
+          <button
+            ref={focusRef}
+            type="button"
+            onClick={onBack}
+            className={primaryButton}
+          >
+            {backLabel}
+          </button>
+        )}
         <button type="button" onClick={onRestart} className={secondaryButton}>
           Jugar de nuevo
         </button>
-        <button type="button" onClick={onBack} className={secondaryButton}>
-          ← Volver al rompecabezas
-        </button>
+        {onNextGame && (
+          <button type="button" onClick={onBack} className={secondaryButton}>
+            {backLabel}
+          </button>
+        )}
       </div>
     </Panel>
   );

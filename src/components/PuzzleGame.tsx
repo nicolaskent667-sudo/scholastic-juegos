@@ -24,15 +24,22 @@ function trayPieceWidth(cols: number): number {
   return 72;
 }
 
+export type PuzzleCampaign = {
+  label: string;
+  rows: number;
+  cols: number;
+  /** Se llama al completar, con los movimientos usados. */
+  onFinish: (moves: number) => void;
+};
+
 type Props = {
-  /** Lleva al nivel de vuelo. */
-  onNextGame: () => void;
-  /** Atajo directo al nivel 3. */
-  onSkipToWordSearch: () => void;
-  /** Atajo directo al nivel 4. */
-  onSkipToMemo: () => void;
-  /** Vuelve a la portada. */
+  /** Lleva al nivel de vuelo. Solo en el modo libre. */
+  onNextGame?: () => void;
+  onSkipToWordSearch?: () => void;
+  onSkipToMemo?: () => void;
+  /** Vuelve a la portada, o al mapa si viene de la campaña. */
   onHome: () => void;
+  campaign?: PuzzleCampaign;
 };
 
 export default function PuzzleGame({
@@ -40,17 +47,46 @@ export default function PuzzleGame({
   onSkipToWordSearch,
   onSkipToMemo,
   onHome,
+  campaign,
 }: Props) {
   const { unlock } = useProgress();
-  const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
-  const [tray, setTray] = useState<Piece[]>([]);
-  const [placed, setPlaced] = useState<(number | null)[]>([]);
+
+  /**
+   * En modo campaña el nivel arranca armado, sin pasar por el selector.
+   * El reparto se calcula una sola vez con el initializer perezoso: este
+   * subárbol nunca se renderiza en el servidor (la app abre en la portada),
+   * así que el Math.random de la mezcla no puede provocar hydration mismatch.
+   */
+  const [deal] = useState(() =>
+    campaign
+      ? {
+          difficulty: {
+            id: "normal" as const,
+            label: campaign.label,
+            emoji: "🧩",
+            rows: campaign.rows,
+            cols: campaign.cols,
+          },
+          tray: shuffleDistinct(createPieces(campaign.rows, campaign.cols)),
+          placed: Array<number | null>(campaign.rows * campaign.cols).fill(null),
+          startedAt: Date.now(),
+        }
+      : null,
+  );
+
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(
+    deal?.difficulty ?? null,
+  );
+  const [tray, setTray] = useState<Piece[]>(deal?.tray ?? []);
+  const [placed, setPlaced] = useState<(number | null)[]>(deal?.placed ?? []);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [wrongSlot, setWrongSlot] = useState<number | null>(null);
   const [justPlaced, setJustPlaced] = useState<number | null>(null);
   const [moves, setMoves] = useState(0);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [now, setNow] = useState(0);
+  const [startedAt, setStartedAt] = useState<number | null>(
+    deal?.startedAt ?? null,
+  );
+  const [now, setNow] = useState(deal?.startedAt ?? 0);
   const [showGuide, setShowGuide] = useState(false);
 
   const wrongTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -132,12 +168,14 @@ export default function PuzzleGame({
           if (difficulty.cols >= 5) earned.push("puzzle-hard");
           if (difficulty.cols <= 3 && seconds < 60) earned.push("puzzle-fast");
           unlock(...earned);
+          // `moves` todavía no incluye este movimiento: lo sumamos acá.
+          campaign?.onFinish(moves + 1);
         }
       } else {
         flashWrong(slotIndex);
       }
     },
-    [placed, flashWrong, difficulty, startedAt, unlock],
+    [placed, flashWrong, difficulty, startedAt, unlock, campaign, moves],
   );
 
   const handleDrop = useCallback(
@@ -171,13 +209,15 @@ export default function PuzzleGame({
     return (
       <DifficultyPicker
         onStart={startLevel}
-        onSkipToFlappy={onNextGame}
-        onSkipToWordSearch={onSkipToWordSearch}
-        onSkipToMemo={onSkipToMemo}
+        onSkipToFlappy={onNextGame ?? onHome}
+        onSkipToWordSearch={onSkipToWordSearch ?? onHome}
+        onSkipToMemo={onSkipToMemo ?? onHome}
         onHome={onHome}
       />
     );
   }
+
+  const backLabel = campaign ? "← Mapa" : "← Nivel";
 
   return (
     <div className="mx-auto w-full max-w-6xl px-3 py-5 sm:px-5">
@@ -186,6 +226,10 @@ export default function PuzzleGame({
           <button
             type="button"
             onClick={() => {
+              if (campaign) {
+                onHome();
+                return;
+              }
               setDifficulty(null);
               setStartedAt(null);
               setPlaced([]);
@@ -193,7 +237,7 @@ export default function PuzzleGame({
             }}
             className="cursor-pointer rounded-2xl border-[3px] border-tinta bg-crema px-4 py-2 font-extrabold text-tinta shadow-[0_4px_0_rgba(90,42,51,0.3)] outline-none transition hover:-translate-y-0.5 hover:bg-blush/50 focus-visible:ring-4 focus-visible:ring-cielo-azul active:translate-y-1 active:shadow-none"
           >
-            ← Nivel
+            {backLabel}
           </button>
           <button
             type="button"
@@ -269,9 +313,15 @@ export default function PuzzleGame({
         <WinOverlay
           seconds={elapsed}
           moves={moves}
-          onNextGame={onNextGame}
+          pieces={rows * cols}
+          campaignMode={campaign !== undefined}
+          onNextGame={onNextGame ?? onHome}
           onReplay={() => startLevel(difficulty)}
           onChangeDifficulty={() => {
+            if (campaign) {
+              onHome();
+              return;
+            }
             setDifficulty(null);
             setStartedAt(null);
             setPlaced([]);

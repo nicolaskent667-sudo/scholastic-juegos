@@ -30,6 +30,8 @@ type Props = {
   previousBest?: MemoRecord;
   isNewBest: boolean;
   hasNextLevel: boolean;
+  /** En la campaña los botones vuelven al mapa. */
+  campaignMode: boolean;
   onNextLevel: () => void;
   onReplay: () => void;
   onLevels: () => void;
@@ -52,6 +54,7 @@ export default function MemoWin({
   previousBest,
   isNewBest,
   hasNextLevel,
+  campaignMode,
   onNextLevel,
   onReplay,
   onLevels,
@@ -133,7 +136,7 @@ export default function MemoWin({
             Jugar de nuevo
           </button>
           <button type="button" onClick={onLevels} className={secondaryButton}>
-            ← Elegir nivel
+            {campaignMode ? "← Volver al mapa" : "← Elegir nivel"}
           </button>
         </div>
       </div>
