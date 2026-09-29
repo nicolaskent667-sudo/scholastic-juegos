@@ -15,6 +15,8 @@ const MAX_HINTS = 3;
 const IDLE_MESSAGE = "Uní los puntos del mismo color";
 
 export type FlowCampaign = {
+  /** Salta al nivel siguiente. Ausente en el ultimo de cada mundo. */
+  onNextLevel?: () => void;
   /** Se llama al resolver, con los movimientos usados. */
   onFinish: (moves: number) => void;
 };
@@ -65,6 +67,24 @@ export default function FlowGame({ level, onBack, campaign }: Props) {
 
   const { paths, drawing, moves, solved, connected, startAt, reset } =
     useFlowBoard(level, handleSolved);
+
+  /**
+   * Suena cada vez que un tubo queda unido de punta a punta.
+   * Se compara contra el render anterior en lugar de avisar desde el hook,
+   * porque un tubo tambien puede cerrarse indirectamente: al recortar otro
+   * color, o al deshacer un trazo que lo tapaba.
+   */
+  const connectedKey = connected.map((done) => (done ? "1" : "0")).join("");
+  const prevConnectedRef = useRef(connectedKey);
+
+  useEffect(() => {
+    const previous = prevConnectedRef.current;
+    prevConnectedRef.current = connectedKey;
+    const justJoined = [...connectedKey].some(
+      (done, i) => done === "1" && previous[i] === "0",
+    );
+    if (justJoined) playEffect("union");
+  }, [connectedKey]);
 
   const handleCellDown = useCallback(
     (event: React.PointerEvent<HTMLElement>, cell: Cell) => {
@@ -235,6 +255,7 @@ export default function FlowGame({ level, onBack, campaign }: Props) {
           pipes={level.colors.length}
           hintsUsed={hintsUsed}
           campaignMode={campaign !== undefined}
+          onNextLevel={campaign?.onNextLevel}
           onReplay={restart}
           onBack={onBack}
         />

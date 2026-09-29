@@ -14,13 +14,19 @@ type Props = {
   level: CampaignLevel;
   /** Vuelve al mapa del mundo. */
   onExit: () => void;
+  /** Arranca el nivel que sigue. Ausente en el ultimo de cada mundo. */
+  onNextLevel?: () => void;
 };
 
 /**
  * Corre un nivel de la campaña: elige el minijuego según la config, lo entrega
  * ya armado (sin su selector) y traduce el resultado a estrellas.
  */
-export default function CampaignPlayer({ level, onExit }: Props) {
+export default function CampaignPlayer({
+  level,
+  onExit,
+  onNextLevel,
+}: Props) {
   const { recordLevelStars } = useProgress();
 
   const finish = useCallback(
@@ -40,6 +46,7 @@ export default function CampaignPlayer({ level, onExit }: Props) {
           onHome={onExit}
           campaign={{
             label: title,
+            onNextLevel,
             rows: config.rows,
             cols: config.cols,
             onFinish: (moves) =>
@@ -54,6 +61,7 @@ export default function CampaignPlayer({ level, onExit }: Props) {
           onBack={onExit}
           campaign={{
             label: title,
+            onNextLevel,
             lamps: config.lamps,
             speed: config.speed,
             onFinish: (hearts) => finish({ kind: "flappy", hearts }),
@@ -66,6 +74,7 @@ export default function CampaignPlayer({ level, onExit }: Props) {
         <WordSearchGame
           onBack={onExit}
           campaign={{
+            onNextLevel,
             worldId: config.worldId,
             onFinish: (hints) => finish({ kind: "wordsearch", hints }),
           }}
@@ -77,6 +86,7 @@ export default function CampaignPlayer({ level, onExit }: Props) {
         <MemoGame
           onBack={onExit}
           campaign={{
+            onNextLevel,
             levelId: config.levelId,
             pairs: config.pairs,
             onFinish: (tries) =>
@@ -93,6 +103,7 @@ export default function CampaignPlayer({ level, onExit }: Props) {
           level={flowLevel}
           onBack={onExit}
           campaign={{
+            onNextLevel,
             onFinish: (moves) =>
               finish({
                 kind: "flow",

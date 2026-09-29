@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { playEffect } from "@/lib/audio";
 import {
   BIRD,
   GOAL_LAMPS,
@@ -124,6 +125,9 @@ export function useFlappyEngine(
       changeStatus("playing");
     }
     birdRef.current.vy = PHYSICS.flapImpulse;
+    // Va acá y no en el componente porque este es el único punto que sabe si
+    // el aleteo pasó de verdad: tocar en pausa o en el game over no suena.
+    playEffect("pop");
   }, [changeStatus]);
 
   const togglePause = useCallback(() => {

@@ -31,6 +31,8 @@ function Heart({ filled }: { filled: boolean }) {
 }
 
 export type FlappyCampaign = {
+  /** Salta al nivel siguiente. Ausente en el ultimo de cada mundo. */
+  onNextLevel?: () => void;
   /** Rótulo que reemplaza al badge "NIVEL 2" del HUD. */
   label: string;
   lamps: number;
@@ -83,7 +85,12 @@ export default function FlappyGame({ onBack, onNextGame, campaign }: Props) {
     // `reset` deja el juego en "ready": el primer toque vuelve a arrancar.
   }, [reset]);
 
-  const backLabel = campaign ? "← Volver al mapa" : "← Rompecabezas";
+  const backLabel = campaign ? "← Mapa" : "← Rompecabezas";
+
+  // En la campaña el botón principal encadena niveles; en el último no hay a
+  // dónde seguir y solo queda volver al mapa.
+  const goNext = campaign ? campaign.onNextLevel : onNextGame;
+  const nextLabel = campaign ? "Siguiente nivel →" : "Siguiente juego →";
 
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -194,8 +201,9 @@ export default function FlappyGame({ onBack, onNextGame, campaign }: Props) {
             goal={goalLamps}
             onRestart={restart}
             onBack={onBack}
-            onNextGame={onNextGame}
-            backLabel={backLabel}
+            onNextGame={goNext}
+            nextLabel={nextLabel}
+            backLabel={campaign ? "← Volver al mapa" : backLabel}
           />
         )}
       </div>

@@ -27,6 +27,8 @@ function trayPieceWidth(cols: number): number {
 }
 
 export type PuzzleCampaign = {
+  /** Salta al nivel siguiente. Ausente en el ultimo de cada mundo. */
+  onNextLevel?: () => void;
   label: string;
   rows: number;
   cols: number;
@@ -228,6 +230,17 @@ export default function PuzzleGame({
 
   const backLabel = campaign ? "← Mapa" : "← Nivel";
 
+  // En la campaña el botón principal encadena niveles; en el último no hay a
+  // dónde seguir, así que vuelve al mapa.
+  const goNext = campaign
+    ? (campaign.onNextLevel ?? onHome)
+    : (onNextGame ?? onHome);
+  const nextLabel = campaign
+    ? campaign.onNextLevel
+      ? "Siguiente nivel →"
+      : "← Volver al mapa"
+    : "Siguiente juego →";
+
   return (
     <div className="mx-auto w-full max-w-6xl px-3 py-5 sm:px-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -324,7 +337,8 @@ export default function PuzzleGame({
           moves={moves}
           pieces={rows * cols}
           campaignMode={campaign !== undefined}
-          onNextGame={onNextGame ?? onHome}
+          nextLabel={nextLabel}
+          onNextGame={goNext}
           onReplay={() => startLevel(difficulty)}
           onChangeDifficulty={() => {
             if (campaign) {

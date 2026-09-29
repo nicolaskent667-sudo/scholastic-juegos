@@ -25,6 +25,8 @@ type Props = {
   pipes: number;
   hintsUsed: number;
   campaignMode: boolean;
+  /** Ausente en el último nivel del mundo. */
+  onNextLevel?: () => void;
   onReplay: () => void;
   onBack: () => void;
 };
@@ -44,6 +46,7 @@ export default function FlowWin({
   pipes,
   hintsUsed,
   campaignMode,
+  onNextLevel,
   onReplay,
   onBack,
 }: Props) {
@@ -93,11 +96,21 @@ export default function FlowWin({
         </dl>
 
         <div className="mt-5 flex flex-col gap-3">
+          {onNextLevel && (
+            <button
+              ref={focusRef}
+              type="button"
+              onClick={onNextLevel}
+              className={primaryButton}
+            >
+              Siguiente nivel →
+            </button>
+          )}
           <button
-            ref={focusRef}
+            ref={onNextLevel ? undefined : focusRef}
             type="button"
             onClick={onBack}
-            className={primaryButton}
+            className={onNextLevel ? secondaryButton : primaryButton}
           >
             {campaignMode ? "← Volver al mapa" : "← Volver"}
           </button>

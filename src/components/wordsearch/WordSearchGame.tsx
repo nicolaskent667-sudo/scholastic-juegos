@@ -27,6 +27,8 @@ const MAX_HINTS = 3;
 const IDLE_MESSAGE = "¿Dónde estarán?";
 
 export type WordSearchCampaign = {
+  /** Salta al nivel siguiente. Ausente en el ultimo de cada mundo. */
+  onNextLevel?: () => void;
   worldId: number;
   /** Se llama al completar, con las pistas usadas. */
   onFinish: (hints: number) => void;
@@ -274,6 +276,7 @@ export default function WordSearchGame({
           hintsUsed={hintsUsed}
           hasNextWorld={hasNextWorld && !campaign}
           campaignMode={campaign !== undefined}
+          onNextLevel={campaign?.onNextLevel}
           onNextGame={onNextGame ?? onBack}
           onNextWorld={nextWorld}
           onReplay={() => startWorld(world)}

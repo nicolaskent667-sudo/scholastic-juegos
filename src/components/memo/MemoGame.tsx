@@ -22,6 +22,8 @@ import { formatTime } from "@/lib/puzzle";
 const PEEK_MS = 900;
 
 export type MemoCampaign = {
+  /** Salta al nivel siguiente. Ausente en el ultimo de cada mundo. */
+  onNextLevel?: () => void;
   levelId: MemoLevelId;
   pairs: number;
   /** Se llama al completar, con los intentos usados. */
@@ -283,9 +285,9 @@ export default function MemoGame({ onBack, campaign }: Props) {
           pairs={level.pairs}
           previousBest={bestAtStart}
           isNewBest={isBetterRecord(result, bestAtStart)}
-          hasNextLevel={hasNextLevel && !campaign}
+          hasNextLevel={campaign ? campaign.onNextLevel !== undefined : hasNextLevel}
           campaignMode={campaign !== undefined}
-          onNextLevel={nextLevel}
+          onNextLevel={campaign ? (campaign.onNextLevel ?? onBack) : nextLevel}
           onReplay={() => beginLevel(level)}
           onLevels={backToLevels}
         />

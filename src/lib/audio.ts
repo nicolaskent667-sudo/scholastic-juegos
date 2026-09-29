@@ -8,14 +8,19 @@ export const SOUNDS = {
   music: "/sounds/musica-de-fondo.mp3",
   victoria: "/sounds/victoria.mp3",
   bloque: "/sounds/bloque.mp3",
+  union: "/sounds/union.mp3",
+  pop: "/sounds/pop.mp3",
 } as const;
 
-export type EffectName = "victoria" | "bloque";
+export type EffectName = "victoria" | "bloque" | "union" | "pop";
 
 const MUSIC_VOLUME = 0.3;
 const EFFECT_VOLUME: Record<EffectName, number> = {
   victoria: 0.7,
   bloque: 0.45,
+  union: 0.55,
+  // Suena en cada aleteo, varias veces por segundo: va bajo a propósito.
+  pop: 0.3,
 };
 
 /** Margen antes de pausar: evita el corte al pasar de un nivel a otro. */

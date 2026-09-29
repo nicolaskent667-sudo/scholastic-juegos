@@ -8,8 +8,10 @@ type Props = {
   seconds: number;
   moves: number;
   pieces: number;
-  /** En la campaña el botón principal vuelve al mapa. */
+  /** En la campaña el botón principal salta al nivel siguiente. */
   campaignMode: boolean;
+  /** Rótulo del botón principal. */
+  nextLabel: string;
   onReplay: () => void;
   onChangeDifficulty: () => void;
   onNextGame: () => void;
@@ -37,6 +39,7 @@ export default function WinOverlay({
   moves,
   pieces,
   campaignMode,
+  nextLabel,
   onReplay,
   onChangeDifficulty,
   onNextGame,
@@ -110,7 +113,7 @@ export default function WinOverlay({
           onClick={onNextGame}
           className="mt-5 w-full cursor-pointer rounded-2xl border-[3px] border-tinta bg-sol px-4 py-3 text-xl font-extrabold text-tinta shadow-[0_5px_0_rgba(90,42,51,0.3)] outline-none transition hover:-translate-y-0.5 focus-visible:ring-4 focus-visible:ring-cielo-azul active:translate-y-1 active:shadow-none"
         >
-          {campaignMode ? "← Volver al mapa" : "Siguiente juego →"}
+          {nextLabel}
         </button>
 
         {moves > pieces && (

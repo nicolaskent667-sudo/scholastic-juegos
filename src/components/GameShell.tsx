@@ -57,6 +57,20 @@ export default function GameShell() {
     setScreen(world ? "map" : "worlds");
   }, [world]);
 
+  /** El nivel que sigue dentro del mismo mundo, o null si era el último. */
+  const nextLevel =
+    level && world
+      ? (world.levels.find((l) => l.index === level.index + 1) ?? null)
+      : null;
+
+  const goToNextLevel = useCallback(() => {
+    if (!nextLevel) {
+      backToMap();
+      return;
+    }
+    setLevel(nextLevel);
+  }, [nextLevel, backToMap]);
+
   switch (screen) {
     case "worlds":
       return <WorldSelect onPickWorld={pickWorld} onBack={goToStart} />;
@@ -72,7 +86,12 @@ export default function GameShell() {
       return level ? (
         // La key remonta el minijuego al cambiar de nivel, para que vuelva a
         // repartir desde cero en vez de arrastrar el estado del anterior.
-        <CampaignPlayer key={level.id} level={level} onExit={backToMap} />
+        <CampaignPlayer
+          key={level.id}
+          level={level}
+          onExit={backToMap}
+          onNextLevel={nextLevel ? goToNextLevel : undefined}
+        />
       ) : (
         <WorldSelect onPickWorld={pickWorld} onBack={goToStart} />
       );

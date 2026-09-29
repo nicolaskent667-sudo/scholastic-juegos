@@ -198,6 +198,7 @@ export function FlappyWinOverlay({
   onRestart,
   onBack,
   onNextGame,
+  nextLabel,
   backLabel,
 }: {
   stars: number;
@@ -206,8 +207,9 @@ export function FlappyWinOverlay({
   goal: number;
   onRestart: () => void;
   onBack: () => void;
-  /** Ausente en el modo campaña: ahí se vuelve al mapa. */
+  /** Botón principal: siguiente juego en libre, siguiente nivel en campaña. */
   onNextGame?: () => void;
+  nextLabel?: string;
   backLabel: string;
 }) {
   const focusRef = useRef<HTMLButtonElement>(null);
@@ -231,7 +233,7 @@ export function FlappyWinOverlay({
             onClick={onNextGame}
             className={primaryButton}
           >
-            Siguiente juego →
+            {nextLabel ?? "Siguiente juego →"}
           </button>
         ) : (
           <button

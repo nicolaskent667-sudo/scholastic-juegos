@@ -27,8 +27,10 @@ type Props = {
   seconds: number;
   hintsUsed: number;
   hasNextWorld: boolean;
-  /** En la campaña no hay "siguiente juego": se vuelve al mapa. */
+  /** En la campaña el botón principal salta al nivel siguiente. */
   campaignMode: boolean;
+  /** Ausente en el último nivel del mundo. */
+  onNextLevel?: () => void;
   onNextWorld: () => void;
   onReplay: () => void;
   onWorlds: () => void;
@@ -51,6 +53,7 @@ export default function WordSearchWin({
   hintsUsed,
   hasNextWorld,
   campaignMode,
+  onNextLevel,
   onNextWorld,
   onReplay,
   onWorlds,
@@ -100,6 +103,16 @@ export default function WordSearchWin({
         </dl>
 
         <div className="mt-5 flex flex-col gap-3">
+          {campaignMode && onNextLevel && (
+            <button
+              ref={focusRef}
+              type="button"
+              onClick={onNextLevel}
+              className={primaryButton}
+            >
+              Siguiente nivel →
+            </button>
+          )}
           {hasNextWorld && (
             <button
               ref={focusRef}
@@ -111,10 +124,10 @@ export default function WordSearchWin({
             </button>
           )}
           <button
-            ref={hasNextWorld ? undefined : focusRef}
+            ref={hasNextWorld || onNextLevel ? undefined : focusRef}
             type="button"
             onClick={onReplay}
-            className={hasNextWorld ? secondaryButton : primaryButton}
+            className={hasNextWorld || onNextLevel ? secondaryButton : primaryButton}
           >
             Jugar de nuevo
           </button>
