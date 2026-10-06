@@ -6,6 +6,7 @@ import DragLayer from "@/components/DragLayer";
 import PuzzleBoard from "@/components/PuzzleBoard";
 import PuzzleTray from "@/components/PuzzleTray";
 import WinOverlay from "@/components/WinOverlay";
+import OptionsButton from "@/components/ui/OptionsButton";
 import { useProgress } from "@/hooks/useProgress";
 import { usePointerDrag } from "@/hooks/usePointerDrag";
 import { playEffect } from "@/lib/audio";
@@ -276,6 +277,7 @@ export default function PuzzleGame({
           >
             👀 Ver imagen
           </button>
+          <OptionsButton />
         </div>
 
         <dl className="flex items-center gap-2 text-tinta">

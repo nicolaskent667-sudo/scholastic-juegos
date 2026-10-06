@@ -5,6 +5,7 @@ import MemoCard from "@/components/memo/MemoCard";
 import MemoLevelPicker from "@/components/memo/MemoLevelPicker";
 import MemoWin from "@/components/memo/MemoWin";
 import { toolButton } from "@/components/ui/buttons";
+import OptionsButton from "@/components/ui/OptionsButton";
 import { useProgress } from "@/hooks/useProgress";
 import { playEffect } from "@/lib/audio";
 import {
@@ -228,6 +229,7 @@ export default function MemoGame({ onBack, campaign }: Props) {
           <span className="rounded-full border-[3px] border-tinta bg-sol/30 px-4 py-1 text-lg font-extrabold tabular-nums text-tinta">
             ✦ {matched.length}/{level.pairs}
           </span>
+          <OptionsButton />
         </div>
       </header>
 

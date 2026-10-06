@@ -3,6 +3,7 @@
 import { useCallback, useEffect } from "react";
 import { useProgress } from "@/hooks/useProgress";
 import FlappyScene from "@/components/flappy/FlappyScene";
+import OptionsButton from "@/components/ui/OptionsButton";
 import {
   FlappyWinOverlay,
   GameOverOverlay,
@@ -92,6 +93,9 @@ export default function FlappyGame({ onBack, onNextGame, campaign }: Props) {
 
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
+      // Con un cartel abierto (opciones, pausa, victoria) el teclado es suyo:
+      // si no, Escape cerraria el panel y de paso despausaria el juego.
+      if (document.querySelector('[role="dialog"]')) return;
       if (event.key === "Escape") {
         event.preventDefault();
         togglePause();
@@ -157,6 +161,13 @@ export default function FlappyGame({ onBack, onNextGame, campaign }: Props) {
               >
                 {status === "paused" ? "▶" : "⏸"}
               </button>
+              <OptionsButton
+                className="pointer-events-auto h-10 w-10 bg-crema"
+                onOpenChange={(open) => {
+                  // Abrir opciones en pleno vuelo no deberia costarte el nivel.
+                  if (open && status === "playing") togglePause();
+                }}
+              />
             </div>
           </div>
 

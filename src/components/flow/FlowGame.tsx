@@ -5,6 +5,7 @@ import FlowBoard from "@/components/flow/FlowBoard";
 import FlowWin from "@/components/flow/FlowWin";
 import MascotPanel from "@/components/wordsearch/MascotPanel";
 import { toolButton } from "@/components/ui/buttons";
+import OptionsButton from "@/components/ui/OptionsButton";
 import { useFlowBoard } from "@/hooks/useFlowBoard";
 import { useProgress } from "@/hooks/useProgress";
 import { playEffect } from "@/lib/audio";
@@ -157,6 +158,7 @@ export default function FlowGame({ level, onBack, campaign }: Props) {
           <span className="rounded-full border-[3px] border-tinta bg-sol/30 px-4 py-1 text-lg font-extrabold tabular-nums text-tinta">
             ✦ {doneCount}/{level.colors.length}
           </span>
+          <OptionsButton />
         </div>
       </header>
 
