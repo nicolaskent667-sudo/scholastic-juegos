@@ -121,6 +121,6 @@ export default function GameShell() {
       );
 
     default:
-      return <StartScreen onPlay={goToWorlds} onFreePlay={goToPuzzle} />;
+      return <StartScreen onPlay={goToWorlds} />;
   }
 }

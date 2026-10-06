@@ -13,11 +13,9 @@ const APP_VERSION = "v1.0";
 type Props = {
   /** Entra al mapa de mundos. */
   onPlay: () => void;
-  /** Modo libre: los juegos sueltos, sin campaña. */
-  onFreePlay: () => void;
 };
 
-export default function StartScreen({ onPlay, onFreePlay }: Props) {
+export default function StartScreen({ onPlay }: Props) {
   const [panel, setPanel] = useState<"options" | "achievements" | null>(null);
   const { progress, loaded } = useProgress();
 
@@ -84,14 +82,6 @@ export default function StartScreen({ onPlay, onFreePlay }: Props) {
             </div>
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={onFreePlay}
-          className="absolute bottom-3 left-4 z-10 cursor-pointer rounded-full border-2 border-tinta/25 px-3 py-1 text-xs font-bold text-tinta/55 outline-none transition hover:border-tinta hover:bg-white hover:text-tinta focus-visible:ring-4 focus-visible:ring-cielo-azul"
-        >
-          Juego libre
-        </button>
 
         <span className="absolute bottom-3 right-4 z-10 text-sm font-bold text-tinta/60">
           {APP_VERSION}
