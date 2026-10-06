@@ -30,6 +30,8 @@ let music: HTMLAudioElement | null = null;
 const effectPool = new Map<EffectName, HTMLAudioElement>();
 
 let enabled = true;
+/** Multiplicador maestro: conserva el balance entre música y efectos. */
+let master = 1;
 /** Cuántas pantallas están pidiendo música ahora mismo. */
 let listeners = 0;
 let pauseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -45,7 +47,7 @@ function getMusic(): HTMLAudioElement | null {
   if (!music) {
     music = new Audio(SOUNDS.music);
     music.loop = true;
-    music.volume = MUSIC_VOLUME;
+    music.volume = MUSIC_VOLUME * master;
     music.preload = "auto";
   }
   return music;
@@ -124,10 +126,16 @@ export function playEffect(name: EffectName): void {
   const base = getEffect(name);
   if (!base) return;
   const node = base.cloneNode() as HTMLAudioElement;
-  node.volume = EFFECT_VOLUME[name];
+  node.volume = EFFECT_VOLUME[name] * master;
   void node.play().catch(() => {
     // Sin gesto previo todavía: se pierde este efecto y ya.
   });
+}
+
+/** Refleja el volumen elegido en Opciones. Los efectos lo leen al sonar. */
+export function setAudioVolume(next: number): void {
+  master = Math.min(1, Math.max(0, next));
+  if (music) music.volume = MUSIC_VOLUME * master;
 }
 
 /** Refleja la preferencia de Opciones. */

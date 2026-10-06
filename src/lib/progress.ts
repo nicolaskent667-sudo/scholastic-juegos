@@ -52,6 +52,8 @@ export type Settings = {
   reducedMotion: boolean;
   /** Música de fondo y efectos. */
   sound: boolean;
+  /** Volumen maestro, de 0 a 1. Multiplica música y efectos por igual. */
+  volume: number;
 };
 
 /** Mejor marca de un nivel de memotest: menos intentos primero. */
@@ -76,7 +78,7 @@ export const DEFAULT_PROGRESS: Progress = {
   worldsDone: [],
   memoBest: {},
   levelStars: {},
-  settings: { reducedMotion: false, sound: true },
+  settings: { reducedMotion: false, sound: true, volume: 1 },
 };
 
 const MEMO_LEVEL_IDS = new Set<string>(["facil", "dificil", "experto"]);
@@ -95,8 +97,11 @@ const VALID_IDS = new Set<string>(ACHIEVEMENTS.map((a) => a.id));
 /**
  * Lo que vuelve de localStorage es dato ajeno: puede estar corrupto, ser de una
  * versión vieja o venir de otra pestaña. Se valida campo por campo.
+ *
+ * Se exporta para poder comprobar que un progreso guardado por una versión
+ * anterior (sin `volume`, por ejemplo) sigue cargando con valores sanos.
  */
-function sanitize(raw: unknown): Progress {
+export function sanitizeProgress(raw: unknown): Progress {
   if (typeof raw !== "object" || raw === null) return DEFAULT_PROGRESS;
   const data = raw as Record<string, unknown>;
 
@@ -159,6 +164,10 @@ function sanitize(raw: unknown): Progress {
       reducedMotion: settings.reducedMotion === true,
       // El sonido viene prendido salvo que se haya apagado a propósito.
       sound: settings.sound !== false,
+      volume:
+        typeof settings.volume === "number" && Number.isFinite(settings.volume)
+          ? Math.min(1, Math.max(0, settings.volume))
+          : 1,
     },
   };
 }
@@ -168,7 +177,7 @@ export function loadProgress(): Progress {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_PROGRESS;
-    return sanitize(JSON.parse(raw));
+    return sanitizeProgress(JSON.parse(raw));
   } catch {
     // Modo privado, almacenamiento bloqueado o JSON roto: seguimos sin guardar.
     return DEFAULT_PROGRESS;

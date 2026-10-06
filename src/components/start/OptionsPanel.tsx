@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useProgress } from "@/hooks/useProgress";
 import { primaryButton } from "@/components/ui/buttons";
+import { playEffect } from "@/lib/audio";
 
 type Props = {
   onClose: () => void;
@@ -53,6 +54,36 @@ export default function OptionsPanel({ onClose }: Props) {
             className="h-7 w-7 shrink-0 cursor-pointer accent-berry"
           />
         </label>
+
+        <div
+          className={`mt-3 rounded-2xl border-[3px] border-tinta bg-white px-4 py-3 transition-opacity ${
+            progress.settings.sound ? "" : "opacity-40"
+          }`}
+        >
+          <label className="flex items-center justify-between gap-3">
+            <span className="font-extrabold text-tinta">Volumen</span>
+            <span className="tabular-nums text-sm font-bold text-tinta/60">
+              {Math.round(progress.settings.volume * 100)}%
+            </span>
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={Math.round(progress.settings.volume * 100)}
+            disabled={!progress.settings.sound}
+            aria-label="Volumen"
+            onChange={(event) =>
+              setSettings({ volume: Number(event.target.value) / 100 })
+            }
+            // Un sonidito al soltar: la música ya se oye cambiar en vivo, pero
+            // así también se escucha a qué volumen quedaron los efectos.
+            onPointerUp={() => playEffect("pop")}
+            onKeyUp={() => playEffect("pop")}
+            className="mt-2 h-3 w-full cursor-pointer appearance-none rounded-full bg-blush accent-berry disabled:cursor-not-allowed"
+          />
+        </div>
 
         <label className="mt-3 flex cursor-pointer items-center justify-between gap-4 rounded-2xl border-[3px] border-tinta bg-white px-4 py-3">
           <span>

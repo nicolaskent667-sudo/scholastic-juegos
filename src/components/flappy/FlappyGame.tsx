@@ -162,7 +162,8 @@ export default function FlappyGame({ onBack, onNextGame, campaign }: Props) {
                 {status === "paused" ? "▶" : "⏸"}
               </button>
               <OptionsButton
-                className="pointer-events-auto h-10 w-10 bg-crema"
+                compact
+                className="pointer-events-auto bg-crema"
                 onOpenChange={(open) => {
                   // Abrir opciones en pleno vuelo no deberia costarte el nivel.
                   if (open && status === "playing") togglePause();
