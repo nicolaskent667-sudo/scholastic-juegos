@@ -10,7 +10,6 @@ import {
   ReadyOverlay,
 } from "@/components/flappy/FlappyOverlays";
 import { useFlappyEngine, type FlappyOutcome } from "@/hooks/useFlappyEngine";
-import { useGameMusic } from "@/hooks/useGameMusic";
 import { playEffect } from "@/lib/audio";
 import { MAX_HEARTS, WORLD } from "@/lib/flappy";
 
@@ -50,7 +49,6 @@ type Props = {
 
 export default function FlappyGame({ onBack, onNextGame, campaign }: Props) {
   const { unlock, addStars } = useProgress();
-  useGameMusic();
 
   const handleWin = useCallback(
     ({ stars, hearts }: FlappyOutcome) => {

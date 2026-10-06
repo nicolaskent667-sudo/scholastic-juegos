@@ -10,6 +10,7 @@ import MemoGame from "@/components/memo/MemoGame";
 import PuzzleGame from "@/components/PuzzleGame";
 import StartScreen from "@/components/start/StartScreen";
 import WordSearchGame from "@/components/wordsearch/WordSearchGame";
+import { useBackgroundMusic } from "@/hooks/useBackgroundMusic";
 import type { CampaignLevel, CampaignWorld } from "@/lib/campaign";
 import { FLOW_LEVELS } from "@/lib/flow";
 
@@ -30,6 +31,9 @@ type Screen =
 
 /** Único dueño de qué pantalla se ve. */
 export default function GameShell() {
+  // Una sola vez para toda la app: suena en loop en cualquier pantalla.
+  useBackgroundMusic();
+
   const [screen, setScreen] = useState<Screen>("start");
   const [world, setWorld] = useState<CampaignWorld | null>(null);
   const [level, setLevel] = useState<CampaignLevel | null>(null);

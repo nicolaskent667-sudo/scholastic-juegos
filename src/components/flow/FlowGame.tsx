@@ -6,7 +6,6 @@ import FlowWin from "@/components/flow/FlowWin";
 import MascotPanel from "@/components/wordsearch/MascotPanel";
 import { toolButton } from "@/components/ui/buttons";
 import { useFlowBoard } from "@/hooks/useFlowBoard";
-import { useGameMusic } from "@/hooks/useGameMusic";
 import { useProgress } from "@/hooks/useProgress";
 import { playEffect } from "@/lib/audio";
 import { filledCount, type Cell, type FlowLevel } from "@/lib/flow";
@@ -29,7 +28,6 @@ type Props = {
 
 export default function FlowGame({ level, onBack, campaign }: Props) {
   const { unlock } = useProgress();
-  useGameMusic();
 
   const [hintsUsed, setHintsUsed] = useState(0);
   const [hint, setHint] = useState<{ index: number; path: Cell[] } | null>(null);

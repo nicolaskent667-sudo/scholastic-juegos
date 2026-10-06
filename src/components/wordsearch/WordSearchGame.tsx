@@ -9,7 +9,6 @@ import WorldPicker from "@/components/wordsearch/WorldPicker";
 import { toolButton } from "@/components/ui/buttons";
 import { useProgress } from "@/hooks/useProgress";
 import { useCellSelection } from "@/hooks/useCellSelection";
-import { useGameMusic } from "@/hooks/useGameMusic";
 import { playEffect } from "@/lib/audio";
 import { formatTime } from "@/lib/puzzle";
 import {
@@ -47,7 +46,6 @@ export default function WordSearchGame({
   campaign,
 }: Props) {
   const { progress, unlock, markWorldDone } = useProgress();
-  useGameMusic();
 
   /**
    * En modo campaña el mundo arranca abierto. El tablero se genera una sola vez

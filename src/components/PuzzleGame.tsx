@@ -6,7 +6,6 @@ import DragLayer from "@/components/DragLayer";
 import PuzzleBoard from "@/components/PuzzleBoard";
 import PuzzleTray from "@/components/PuzzleTray";
 import WinOverlay from "@/components/WinOverlay";
-import { useGameMusic } from "@/hooks/useGameMusic";
 import { useProgress } from "@/hooks/useProgress";
 import { usePointerDrag } from "@/hooks/usePointerDrag";
 import { playEffect } from "@/lib/audio";
@@ -56,7 +55,6 @@ export default function PuzzleGame({
   campaign,
 }: Props) {
   const { unlock } = useProgress();
-  useGameMusic();
 
   /**
    * En modo campaña el nivel arranca armado, sin pasar por el selector.

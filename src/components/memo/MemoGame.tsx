@@ -5,7 +5,6 @@ import MemoCard from "@/components/memo/MemoCard";
 import MemoLevelPicker from "@/components/memo/MemoLevelPicker";
 import MemoWin from "@/components/memo/MemoWin";
 import { toolButton } from "@/components/ui/buttons";
-import { useGameMusic } from "@/hooks/useGameMusic";
 import { useProgress } from "@/hooks/useProgress";
 import { playEffect } from "@/lib/audio";
 import {
@@ -37,7 +36,6 @@ type Props = {
 
 export default function MemoGame({ onBack, campaign }: Props) {
   const { progress, recordMemoResult } = useProgress();
-  useGameMusic();
 
   /**
    * En modo campaña se entra directo al nivel, con la cantidad de parejas que
