@@ -11,10 +11,12 @@ Tres juegos web para chicos, encadenados uno detrás del otro, construidos sobre
 | **Vuelo** | Estilo Flappy Bird. El pajarito aletea con cada toque y hay que cruzar la luz que queda entre los dos faroles de cada poste, con tres corazones y estrellas para juntar. |
 | **Sopa de letras** | Nueve mundos ordenados por dificultad, de palabras de 3 letras hasta LAGARTIJA y PRIMAVERA. Se arrastra sobre la grilla para marcar cada palabra. |
 | **Memotest** | Tres niveles: con nombre y color propio, con el mismo fondo, y sin nombres con variantes mínimas del mismo personaje. |
+| **Unir colores** | Tubos que conectan pares de puntos hasta llenar el tablero, al estilo Flow. |
+| **Mezclar tubos** | Water sort: volcar porciones de color hasta dejar cada tubo de un solo color. |
 
 ## El mapa
 
-Desde "Jugar" se entra a la campaña: cuatro mundos, uno por juego, con **27 niveles y 81
+Desde "Jugar" se entra a la campaña: seis mundos, uno por juego, con **43 niveles y 129
 estrellas** en total. Cada mundo es un mapa con un sendero serpenteante donde los niveles se van
 desbloqueando de a uno.
 
@@ -22,8 +24,9 @@ Las tres estrellas de cada nivel salen del desempeño, y cada juego mide lo suyo
 fuera de lugar, corazones que sobraron, pistas usadas, intentos de más. Terminar siempre da al
 menos una y desbloquea el nivel siguiente, así que nunca se traba el avance.
 
-El botón **"Juego libre"** de la portada lleva a los juegos sueltos, con sus propios selectores de
-dificultad y sin campaña.
+Todo se juega desde el mapa. Los selectores sueltos de cada juego (dificultad del rompecabezas,
+mundos de la sopa, niveles del memotest) siguen en el código pero ya no tienen acceso desde la
+interfaz.
 
 ## Arrancar
 
@@ -56,6 +59,8 @@ src/
     flappy/              vuelo
     wordsearch/          sopa de letras
     memo/                memotest
+    flow/                unir colores
+    tubes/               mezclar tubos
     ui/buttons.ts        estilos de botón compartidos
   hooks/
     usePointerDrag.ts    arrastre de las piezas del rompecabezas
@@ -69,6 +74,8 @@ src/
     flappy.ts            física, colisiones y generación de faroles
     wordsearch.ts        mundos, generador de tableros y validación
     memo.ts              cartas y armado del mazo
+    flow.ts              tableros de unir colores y validacion
+    tubes.ts             niveles de mezclar tubos y reglas de volcado
     progress*.ts         persistencia en localStorage
 ```
 

@@ -5,7 +5,13 @@
 
 import type { MemoLevelId } from "@/lib/memo";
 
-export type GameKind = "puzzle" | "flappy" | "wordsearch" | "memo" | "flow";
+export type GameKind =
+  | "puzzle"
+  | "flappy"
+  | "wordsearch"
+  | "memo"
+  | "flow"
+  | "tubes";
 
 /** Cómo se configura el minijuego cuando se entra desde el mapa. */
 export type LevelConfig =
@@ -13,7 +19,8 @@ export type LevelConfig =
   | { kind: "flappy"; lamps: number; speed: number }
   | { kind: "wordsearch"; worldId: number }
   | { kind: "memo"; levelId: MemoLevelId; pairs: number }
-  | { kind: "flow"; levelId: number };
+  | { kind: "flow"; levelId: number }
+  | { kind: "tubes"; levelId: number };
 
 export type CampaignLevel = {
   /** Único en toda la campaña: "2-4". */
@@ -130,6 +137,23 @@ export const WORLDS: CampaignWorld[] = [
       { label: "7 × 7 · 7 tubos", config: { kind: "flow", levelId: 8 } },
     ]),
   },
+  {
+    id: 6,
+    name: "Mezclar tubos",
+    hint: "Dejá cada tubo de un solo color",
+    emoji: "🧪",
+    kind: "tubes",
+    levels: makeLevels(6, [
+      { label: "4 colores", config: { kind: "tubes", levelId: 1 } },
+      { label: "4 colores", config: { kind: "tubes", levelId: 2 } },
+      { label: "5 colores", config: { kind: "tubes", levelId: 3 } },
+      { label: "5 colores", config: { kind: "tubes", levelId: 4 } },
+      { label: "6 colores", config: { kind: "tubes", levelId: 5 } },
+      { label: "6 colores", config: { kind: "tubes", levelId: 6 } },
+      { label: "7 colores", config: { kind: "tubes", levelId: 7 } },
+      { label: "7 colores", config: { kind: "tubes", levelId: 8 } },
+    ]),
+  },
 ];
 
 export const ALL_LEVELS: CampaignLevel[] = WORLDS.flatMap((w) => w.levels);
@@ -152,7 +176,8 @@ export type LevelResult =
   | { kind: "flappy"; hearts: number }
   | { kind: "wordsearch"; hints: number }
   | { kind: "memo"; tries: number; pairs: number }
-  | { kind: "flow"; moves: number; pipes: number };
+  | { kind: "flow"; moves: number; pipes: number }
+  | { kind: "tubes"; moves: number; par: number };
 
 /**
  * Una estrella por terminar; las otras dos por hacerlo bien.
@@ -182,6 +207,11 @@ export function starsFor(result: LevelResult): 1 | 2 | 3 {
       const extra = Math.max(0, result.moves - result.pipes);
       if (extra === 0) return 3;
       return extra <= result.pipes ? 2 : 1;
+    }
+    case "tubes": {
+      // El par es el mínimo real del nivel, calculado con BFS al generarlo.
+      if (result.moves <= result.par + 2) return 3;
+      return result.moves <= result.par * 2 ? 2 : 1;
     }
   }
 }
