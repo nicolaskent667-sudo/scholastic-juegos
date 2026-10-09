@@ -124,6 +124,11 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
     hintTimer.current = setTimeout(() => setHinted(null), 4000);
   }, [solved, hintsUsed, tubes, say]);
 
+  // Los tubos (mas el hueco con candado) se reparten en dos filas parejas:
+  // con tres filas el tablero no entraba en una pantalla de celular.
+  const slots = tubes.length + (extraLeft > 0 ? 1 : 0);
+  const columns = Math.min(5, Math.max(4, Math.ceil(slots / 2)));
+
   const status = solved
     ? "¡Lo lograste!"
     : stuck
@@ -131,13 +136,13 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
       : message;
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-3 py-4 sm:px-5">
-      <header className="mb-5 flex items-start justify-between gap-3">
+    <div className="mx-auto w-full max-w-3xl px-3 py-2 sm:px-5 sm:py-4">
+      <header className="mb-3 flex items-start justify-between gap-3 sm:mb-4">
         <button
           type="button"
           onClick={onBack}
           aria-label="Volver"
-          className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border-[3px] border-tinta bg-white text-2xl font-extrabold text-berry outline-none transition hover:bg-blush/50 focus-visible:ring-4 focus-visible:ring-cielo-azul"
+          className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border-[3px] border-tinta bg-white text-xl font-extrabold text-berry outline-none transition hover:bg-blush/50 focus-visible:ring-4 focus-visible:ring-cielo-azul"
         >
           ‹
         </button>
@@ -146,7 +151,7 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
           <span className="rounded-full border-[3px] border-tinta bg-berry px-5 py-0.5 text-sm font-extrabold tracking-wide text-white">
             {tierOf(level.id)}
           </span>
-          <h1 className="text-3xl font-extrabold text-berry sm:text-4xl">
+          <h1 className="text-2xl font-extrabold text-berry sm:text-3xl">
             Nivel {level.id}
           </h1>
         </div>
@@ -157,7 +162,7 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
             type="button"
             onClick={restart}
             aria-label="Reiniciar el nivel"
-            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-[3px] border-tinta bg-white text-2xl text-berry outline-none transition hover:bg-blush/50 focus-visible:ring-4 focus-visible:ring-cielo-azul"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-[3px] border-tinta bg-white text-xl text-berry outline-none transition hover:bg-blush/50 focus-visible:ring-4 focus-visible:ring-cielo-azul"
           >
             <span aria-hidden className="block leading-none">
               ↻
@@ -166,7 +171,15 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
         </div>
       </header>
 
-      <ul className="grid grid-cols-4 gap-3 sm:gap-5">
+      <ul
+        className="mx-auto grid gap-2 sm:gap-3"
+        style={{
+          gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+          // Dos filas de tubos no pueden pasar de ~45vh, y el tubo es 3.1
+          // veces mas alto que ancho: de ahi sale el 8vh de ancho maximo.
+          maxWidth: `calc(${columns} * min(5.5rem, 8vh) + ${columns - 1} * 0.75rem)`,
+        }}
+      >
         {tubes.map((tube, i) => {
           const top = tube[tube.length - 1];
           const topName =
@@ -206,7 +219,7 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
       </ul>
 
       {/* Mascotas, globo de diálogo y el botón de tubo extra */}
-      <div className="mt-6 flex items-end justify-center gap-3">
+      <div className="mt-4 flex items-end justify-center gap-3">
         <svg
           viewBox="-110 -110 220 200"
           className="hidden h-24 w-auto shrink-0 sm:block"
@@ -241,7 +254,7 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
       </div>
 
       {/* Barra inferior */}
-      <div className="mt-6 flex items-center justify-between gap-3 rounded-3xl border-[3px] border-tinta bg-crema px-4 py-3">
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-3xl border-[3px] border-tinta bg-crema px-4 py-2">
         <button
           type="button"
           onClick={undo}
