@@ -42,12 +42,19 @@ function Panel({
     autoFocusRef?.current?.focus();
   }, [autoFocusRef]);
 
+  /*
+   * Va `fixed` y no `absolute`: el recuadro del juego tiene proporción fija
+   * 1000x600, así que en un celular en vertical mide unos 220px de alto, y el
+   * cartel necesita ~315px. Quedaba recortado arriba y abajo por el
+   * overflow-hidden de ese recuadro. Los otros cuatro minijuegos ya usaban
+   * fixed; este era el único encerrado en la caja del juego.
+   */
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-label={title}
-      className="absolute inset-0 z-30 flex items-center justify-center overflow-hidden bg-tinta/45 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-40 flex items-center justify-center overflow-hidden bg-tinta/45 p-4 backdrop-blur-sm"
     >
       {confetti && (
         <div aria-hidden className="pointer-events-none absolute inset-0">
