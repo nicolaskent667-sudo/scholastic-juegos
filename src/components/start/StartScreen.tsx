@@ -21,10 +21,10 @@ export default function StartScreen({ onPlay }: Props) {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-3 py-4 sm:px-5">
-      <div className="relative min-h-[min(88vh,760px)] w-full overflow-hidden rounded-3xl border-[3px] border-tinta shadow-[0_10px_0_rgba(90,42,51,0.18)]">
+      <div className="relative min-h-[min(88dvh,760px)] w-full overflow-hidden rounded-3xl border-[3px] border-tinta shadow-[0_10px_0_rgba(90,42,51,0.18)]">
         <StartScene />
 
-        <div className="relative z-10 flex min-h-[min(88vh,760px)] flex-col items-center justify-between gap-3 px-4 py-6 sm:py-8">
+        <div className="relative z-10 flex min-h-[min(88dvh,760px)] flex-col items-center justify-between gap-3 px-4 py-6 sm:py-8">
           <header className="flex flex-col items-center gap-2">
             <h1
               className="text-center text-5xl font-black tracking-tight text-tinta sm:text-7xl"

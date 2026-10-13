@@ -1,17 +1,42 @@
 /**
  * Posiciones de los nodos del mapa y el camino que los une.
- * Puro: sirve para cualquier cantidad de niveles.
+ * Puro: sirve para cualquier cantidad de niveles y de columnas.
  */
 
-export const MAP = {
+export type MapLayout = {
+  width: number;
+  height: number;
+  columns: number;
+  marginX: number;
+  /** Alto de cada fila del serpenteo. */
+  rowHeight: number;
+  bottomY: number;
+};
+
+/** Pantalla ancha: el mapa es apaisado y entran tres niveles por fila. */
+export const MAP_WIDE: MapLayout = {
   width: 1000,
-  height: 640,
+  // 660 y no 640: con la ondita vertical, las estrellitas del nodo mas bajo
+  // se cortaban unos pixeles contra el borde de abajo.
+  height: 660,
   columns: 3,
   marginX: 150,
-  /** Alto de cada fila del serpenteo. */
   rowHeight: 165,
   bottomY: 545,
-} as const;
+};
+
+/**
+ * Celular: dos columnas y mapa vertical. Con tres columnas los nodos quedaban
+ * de unos 34px en pantalla, por debajo del mínimo cómodo para tocar con el dedo.
+ */
+export const MAP_NARROW: MapLayout = {
+  width: 640,
+  height: 1000,
+  columns: 2,
+  marginX: 165,
+  rowHeight: 185,
+  bottomY: 880,
+};
 
 export type MapPoint = { x: number; y: number };
 
@@ -19,8 +44,8 @@ export type MapPoint = { x: number; y: number };
  * Serpentina de abajo hacia arriba: la fila de abajo va de izquierda a derecha,
  * la siguiente al revés, y así. Es lo que da el zigzag del diseño.
  */
-export function nodePositions(count: number): MapPoint[] {
-  const { columns, marginX, width, rowHeight, bottomY } = MAP;
+export function nodePositions(count: number, map: MapLayout): MapPoint[] {
+  const { columns, marginX, width, rowHeight, bottomY } = map;
   const step = (width - marginX * 2) / (columns - 1);
 
   return Array.from({ length: count }, (_, i) => {
@@ -37,8 +62,8 @@ export function nodePositions(count: number): MapPoint[] {
 }
 
 /** El trofeo va después del último nodo, siguiendo el serpenteo. */
-export function trophyPosition(count: number): MapPoint {
-  const [last] = nodePositions(count + 1).slice(-1);
+export function trophyPosition(count: number, map: MapLayout): MapPoint {
+  const [last] = nodePositions(count + 1, map).slice(-1);
   return last;
 }
 

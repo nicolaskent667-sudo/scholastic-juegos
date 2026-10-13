@@ -9,7 +9,14 @@ import {
   type CampaignLevel,
   type CampaignWorld,
 } from "@/lib/campaign";
-import { MAP, nodePositions, smoothPath, trophyPosition } from "@/lib/mapPath";
+import {
+  MAP_NARROW,
+  MAP_WIDE,
+  nodePositions,
+  smoothPath,
+  trophyPosition,
+} from "@/lib/mapPath";
+import { useIsNarrow } from "@/hooks/useIsNarrow";
 
 const NODE_R = 46;
 
@@ -86,8 +93,17 @@ export default function LevelMap({ world, onPickLevel, onBack }: Props) {
   const { progress } = useProgress();
   const stars = progress.levelStars;
 
-  const points = nodePositions(world.levels.length);
-  const trophy = trophyPosition(world.levels.length);
+  // En celular el mapa pasa a dos columnas y formato vertical: con tres, los
+  // nodos quedaban demasiado chicos para tocarlos con el dedo.
+  const narrow = useIsNarrow();
+  const map = narrow ? MAP_NARROW : MAP_WIDE;
+
+  // El decorado se ubica en proporciones del viewBox, que cambia de formato.
+  const vx = (fraction: number) => Math.round(map.width * fraction);
+  const vy = (fraction: number) => Math.round(map.height * fraction);
+
+  const points = nodePositions(world.levels.length, map);
+  const trophy = trophyPosition(world.levels.length, map);
   const path = smoothPath([...points, trophy]);
 
   const earned = world.levels.reduce(
@@ -141,29 +157,29 @@ export default function LevelMap({ world, onPickLevel, onBack }: Props) {
 
       <div className="relative overflow-hidden rounded-3xl border-[3px] border-tinta">
         <svg
-          viewBox={`0 0 ${MAP.width} ${MAP.height}`}
+          viewBox={`0 0 ${map.width} ${map.height}`}
           className="block h-full w-full"
         >
           <title>Mapa de niveles de {world.name}</title>
 
-          <rect x={0} y={0} width={MAP.width} height={MAP.height} fill="var(--color-cielo)" />
+          <rect x={0} y={0} width={map.width} height={map.height} fill="var(--color-cielo)" />
           <path
-            d={`M 0 ${MAP.height * 0.58} C 240 ${MAP.height * 0.5}, 460 ${MAP.height * 0.68}, 760 ${MAP.height * 0.6} C 880 ${MAP.height * 0.56}, 950 ${MAP.height * 0.62}, ${MAP.width} ${MAP.height * 0.58} L ${MAP.width} ${MAP.height} L 0 ${MAP.height} Z`}
+            d={`M 0 ${vy(0.58)} C ${vx(0.24)} ${vy(0.5)}, ${vx(0.46)} ${vy(0.68)}, ${vx(0.76)} ${vy(0.6)} C ${vx(0.88)} ${vy(0.56)}, ${vx(0.95)} ${vy(0.62)}, ${map.width} ${vy(0.58)} L ${map.width} ${map.height} L 0 ${map.height} Z`}
             fill="#d8eede"
           />
           <path
-            d={`M 0 ${MAP.height * 0.72} C 300 ${MAP.height * 0.66}, 520 ${MAP.height * 0.82}, 820 ${MAP.height * 0.74} C 920 ${MAP.height * 0.71}, 960 ${MAP.height * 0.76}, ${MAP.width} ${MAP.height * 0.73} L ${MAP.width} ${MAP.height} L 0 ${MAP.height} Z`}
+            d={`M 0 ${vy(0.72)} C ${vx(0.3)} ${vy(0.66)}, ${vx(0.52)} ${vy(0.82)}, ${vx(0.82)} ${vy(0.74)} C ${vx(0.92)} ${vy(0.71)}, ${vx(0.96)} ${vy(0.76)}, ${map.width} ${vy(0.73)} L ${map.width} ${map.height} L 0 ${map.height} Z`}
             fill="var(--color-menta)"
           />
 
-          {/* Decorado */}
-          <Tree x={70} y={330} s={0.8} />
-          <Tree x={930} y={470} s={0.85} />
+          {/* Decorado, en proporciones para que sirva en los dos formatos */}
+          <Tree x={vx(0.07)} y={vy(0.52)} s={0.8} />
+          <Tree x={vx(0.93)} y={vy(0.73)} s={0.85} />
           <g fill="#ffffff" opacity={0.9}>
-            <ellipse cx={210} cy={430} rx={58} ry={20} />
-            <ellipse cx={168} cy={440} rx={36} ry={15} />
-            <ellipse cx={830} cy={280} rx={54} ry={19} />
-            <ellipse cx={872} cy={290} rx={34} ry={14} />
+            <ellipse cx={vx(0.21)} cy={vy(0.3)} rx={58} ry={20} />
+            <ellipse cx={vx(0.17)} cy={vy(0.32)} rx={36} ry={15} />
+            <ellipse cx={vx(0.83)} cy={vy(0.19)} rx={54} ry={19} />
+            <ellipse cx={vx(0.87)} cy={vy(0.21)} rx={34} ry={14} />
           </g>
 
           {/* Sendero: trazo blanco ancho con la línea punteada rosa encima */}

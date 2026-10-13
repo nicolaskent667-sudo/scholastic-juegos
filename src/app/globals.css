@@ -142,6 +142,16 @@ body {
 }
 
 body {
+  /*
+   * `dvh` y no `vh`: en los navegadores de celular `vh` mide el visor con la
+   * barra de direcciones escondida, asi que todo lo calculado con vh queda mas
+   * alto que lo que se ve y obliga a scrollear.
+   */
+  min-height: 100dvh;
+  /* Un solo elemento que se pase de ancho hace scrollear toda la pagina. */
+  overflow-x: hidden;
+  /* Respeta el notch y la barra de gestos. */
+  padding-bottom: env(safe-area-inset-bottom);
   background: linear-gradient(
     to bottom,
     var(--color-cielo) 0%,

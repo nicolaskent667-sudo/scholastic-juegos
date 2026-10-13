@@ -182,9 +182,9 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
         className="mx-auto grid gap-2 sm:gap-3"
         style={{
           gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-          // Dos filas de tubos no pueden pasar de ~45vh, y el tubo es 3.1
-          // veces mas alto que ancho: de ahi sale el 8vh de ancho maximo.
-          maxWidth: `calc(${columns} * min(5.5rem, 8vh) + ${columns - 1} * 0.75rem)`,
+          // Dos filas de tubos no pueden pasar de ~45dvh, y el tubo es 3.1
+          // veces mas alto que ancho: de ahi sale el 8dvh de ancho maximo.
+          maxWidth: `calc(${columns} * min(5.5rem, 8dvh) + ${columns - 1} * 0.75rem)`,
         }}
       >
         {tubes.map((tube, i) => {

@@ -32,7 +32,7 @@ export default function PuzzleTray({
           : `Faltan ${pieces.length} ${pieces.length === 1 ? "pieza" : "piezas"}`}
       </p>
 
-      <ul className="flex max-h-[42vh] flex-wrap justify-center gap-2 overflow-y-auto sm:gap-3 lg:max-h-[60vh]">
+      <ul className="flex max-h-[42dvh] flex-wrap justify-center gap-2 overflow-y-auto sm:gap-3 lg:max-h-[60dvh]">
         {pieces.map((piece) => {
           const selected = selectedId === piece.id;
           const dragging = draggingId === piece.id;

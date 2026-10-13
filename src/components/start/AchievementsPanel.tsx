@@ -34,7 +34,7 @@ export default function AchievementsPanel({ onClose }: Props) {
       aria-label="Logros"
       className="fixed inset-0 z-50 flex items-center justify-center bg-tinta/45 p-4 backdrop-blur-sm"
     >
-      <div className="animate-rise flex max-h-[90vh] w-full max-w-md flex-col rounded-3xl border-[3px] border-tinta bg-crema p-6 shadow-[0_12px_0_rgba(90,42,51,0.3)]">
+      <div className="animate-rise flex max-h-[90dvh] w-full max-w-md flex-col rounded-3xl border-[3px] border-tinta bg-crema p-6 shadow-[0_12px_0_rgba(90,42,51,0.3)]">
         <h2 className="text-center text-3xl font-extrabold text-tinta">Logros</h2>
         <p className="mt-1 text-center font-bold text-tinta/60">
           {loaded
