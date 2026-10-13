@@ -21,6 +21,9 @@
   --animate-shake: shake 0.4s ease-in-out;
   --animate-float: float 3.5s ease-in-out infinite;
   --animate-rise: rise 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-pour-in: pour-in 0.38s cubic-bezier(0.33, 0.9, 0.5, 1.1);
+  --animate-tube-pour: tube-pour 0.42s ease-in-out;
+  --animate-tube-fill: tube-fill 0.42s ease-out;
 }
 
 @keyframes pop {
@@ -71,6 +74,51 @@
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/*
+ * Las porciones que acaban de caer entran desde arriba del tubo. Las medidas
+ * van en unidades del viewBox (100x310), no en porcentajes, porque en SVG un
+ * porcentaje en un transform necesita transform-box y no es confiable.
+ */
+@keyframes pour-in {
+  0% {
+    transform: translateY(-285px);
+    opacity: 0.2;
+  }
+  70% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* El tubo que vuelca se inclina desde su base. */
+@keyframes tube-pour {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(-15deg);
+  }
+  70% {
+    transform: rotate(-7deg);
+  }
+}
+
+/* El que recibe se sacude apenas, como si le entrara el liquido. */
+@keyframes tube-fill {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  35% {
+    transform: translateY(3px) scaleY(1.03);
   }
 }
 

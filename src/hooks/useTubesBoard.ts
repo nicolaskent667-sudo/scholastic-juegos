@@ -14,9 +14,23 @@ import {
 /** Una sola vez por nivel, como el hueco con candado del diseño. */
 export const EXTRA_TUBES = 1;
 
+/** Cuánto dura el volcado en pantalla; lo mismo que las animaciones del CSS. */
+export const POUR_MS = 420;
+
+export type Pouring = {
+  from: number;
+  to: number;
+  /** Cuántas porciones entraron, para animar solo esas. */
+  amount: number;
+  /** Cambia en cada volcado: reinicia la animación aunque repitas tubos. */
+  nonce: number;
+};
+
 export function useTubesBoard(
   level: TubesLevel,
   onSolved: (moves: number) => void,
+  /** Se llama en cada volcado válido: porciones movidas y si fue sobre color. */
+  onPour?: (amount: number, ontoColor: boolean) => void,
 ) {
   const [tubes, setTubes] = useState<TubesState>(() => cloneTubes(level.tubes));
   /** Tubo levantado esperando destino, o -1. */
@@ -26,20 +40,27 @@ export function useTubesBoard(
   /** Para el sacudón cuando la jugada no vale. */
   const [rejected, setRejected] = useState(-1);
   const [history, setHistory] = useState<TubesState[]>([]);
+  /** Volcado en curso, solo para la animación. */
+  const [pouring, setPouring] = useState<Pouring | null>(null);
 
   const rejectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pourTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pourNonce = useRef(0);
   const solvedRef = useRef(false);
   const onSolvedRef = useRef(onSolved);
+  const onPourRef = useRef(onPour);
   const movesRef = useRef(moves);
 
   useEffect(() => {
     onSolvedRef.current = onSolved;
+    onPourRef.current = onPour;
     movesRef.current = moves;
   });
 
   useEffect(
     () => () => {
       if (rejectTimer.current) clearTimeout(rejectTimer.current);
+      if (pourTimer.current) clearTimeout(pourTimer.current);
     },
     [],
   );
@@ -70,6 +91,8 @@ export function useTubesBoard(
     setExtraUsed(0);
     setHistory([]);
     setRejected(-1);
+    setPouring(null);
+    if (pourTimer.current) clearTimeout(pourTimer.current);
     solvedRef.current = false;
   }, [level]);
 
@@ -90,7 +113,8 @@ export function useTubesBoard(
         return;
       }
 
-      if (pourAmount(tubes, picked, index) === 0) {
+      const amount = pourAmount(tubes, picked, index);
+      if (amount === 0) {
         flashRejected(index);
         setPicked(-1);
         return;
@@ -100,6 +124,13 @@ export function useTubesBoard(
       setTubes(pour(tubes, picked, index));
       setMoves((value) => value + 1);
       setPicked(-1);
+
+      pourNonce.current += 1;
+      setPouring({ from: picked, to: index, amount, nonce: pourNonce.current });
+      if (pourTimer.current) clearTimeout(pourTimer.current);
+      pourTimer.current = setTimeout(() => setPouring(null), POUR_MS);
+
+      onPourRef.current?.(amount, tubes[index].length > 0);
     },
     [solved, picked, tubes, flashRejected],
   );
@@ -110,6 +141,7 @@ export function useTubesBoard(
       const last = prev[prev.length - 1];
       setTubes(last);
       setPicked(-1);
+      setPouring(null);
       // Deshacer descuenta el movimiento: no queremos castigar al que corrige.
       setMoves((value) => Math.max(0, value - 1));
       return prev.slice(0, -1);
@@ -132,6 +164,7 @@ export function useTubesBoard(
     solved,
     stuck,
     rejected,
+    pouring,
     canUndo: history.length > 0,
     extraLeft: EXTRA_TUBES - extraUsed,
     tapTube,

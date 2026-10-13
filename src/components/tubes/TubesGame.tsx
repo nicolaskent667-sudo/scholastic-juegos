@@ -71,6 +71,12 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
     [unlock, hintsUsed, campaign],
   );
 
+  // Suena en cada volcado: es el ruido del liquido cayendo, y seria raro que
+  // sonara al juntar colores pero no al pasar a un tubo vacio.
+  const handlePour = useCallback(() => {
+    playEffect("liquido");
+  }, []);
+
   const {
     tubes,
     picked,
@@ -78,13 +84,14 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
     solved,
     stuck,
     rejected,
+    pouring,
     canUndo,
     extraLeft,
     tapTube,
     undo,
     reset,
     addTube,
-  } = useTubesBoard(level, handleSolved);
+  } = useTubesBoard(level, handleSolved, handlePour);
 
   // Suena al cerrar un tubo, igual que al unir un tubo en "unir colores".
   const doneCount = tubes.filter(isComplete).length;
@@ -193,6 +200,9 @@ export default function TubesGame({ level, onBack, campaign }: Props) {
                 picked={picked === i}
                 rejected={rejected === i}
                 hinted={hinted !== null && (hinted[0] === i || hinted[1] === i)}
+                pouringOut={pouring?.from === i}
+                incoming={pouring?.to === i ? pouring.amount : 0}
+                pourKey={pouring?.nonce ?? 0}
                 onTap={() => handleTap(i)}
                 label={
                   tube.length === 0

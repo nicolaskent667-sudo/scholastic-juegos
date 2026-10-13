@@ -11,6 +11,12 @@ type Props = {
   rejected: boolean;
   /** Señalado por la pista. */
   hinted: boolean;
+  /** Está volcando ahora: se inclina. */
+  pouringOut: boolean;
+  /** Cuántas porciones acaban de caerle: se animan entrando desde arriba. */
+  incoming: number;
+  /** Cambia en cada volcado, para que la animación vuelva a arrancar. */
+  pourKey: number;
   onTap: () => void;
   label: string;
 };
@@ -34,6 +40,9 @@ export default function TubeSprite({
   picked,
   rejected,
   hinted,
+  pouringOut,
+  incoming,
+  pourKey,
   onTap,
   label,
 }: Props) {
@@ -54,6 +63,9 @@ export default function TubeSprite({
         // El tubo elegido se levanta, como si lo tuvieras en la mano.
         picked ? "-translate-y-3" : "hover:-translate-y-1",
         rejected ? "animate-shake" : "",
+        // El que vuelca se inclina desde la base; el que recibe se sacude.
+        pouringOut ? "animate-tube-pour origin-bottom" : "",
+        incoming > 0 ? "animate-tube-fill origin-bottom" : "",
       ].join(" ")}
       style={{ aspectRatio: "1 / 3.1" }}
     >
@@ -76,8 +88,24 @@ export default function TubeSprite({
           {tube.map((colorIndex, i) => {
             const color = TUBE_COLORS[colorIndex % TUBE_COLORS.length];
             const y = FILL_TOP + FILL_HEIGHT - (i + 1) * slotHeight;
+            // Las ultimas `incoming` porciones son las que acaban de caer.
+            const isNew = incoming > 0 && i >= tube.length - incoming;
             return (
-              <g key={i}>
+              <g
+                // La clave incluye el volcado: sin eso React reusa el nodo y
+                // la animacion no vuelve a dispararse al repetir tubos.
+                key={isNew ? `new-${pourKey}-${i}` : i}
+                style={
+                  isNew
+                    ? {
+                        animation: "var(--animate-pour-in)",
+                        // Las de mas abajo caen primero.
+                        animationDelay: `${(tube.length - 1 - i) * 45}ms`,
+                        animationFillMode: "backwards",
+                      }
+                    : undefined
+                }
+              >
                 <rect x={9} y={y} width={82} height={slotHeight} fill={color.fill} />
                 {/* Línea tenue para que se vean dos porciones iguales apiladas */}
                 {i > 0 && (
