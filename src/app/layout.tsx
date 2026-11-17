@@ -22,8 +22,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${baloo.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html lang="es" className={`${baloo.variable} antialiased`}>
+      {/* El alto mínimo (100dvh) sale de globals.css */}
+      <body className="flex flex-col">{children}</body>
     </html>
   );
 }
