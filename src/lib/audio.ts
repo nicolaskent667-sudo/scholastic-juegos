@@ -11,9 +11,16 @@ export const SOUNDS = {
   union: "/sounds/union.mp3",
   pop: "/sounds/pop.mp3",
   liquido: "/sounds/liquido-fluido.mp3",
+  flecha: "/sounds/popflecha.mp3",
 } as const;
 
-export type EffectName = "victoria" | "bloque" | "union" | "pop" | "liquido";
+export type EffectName =
+  | "victoria"
+  | "bloque"
+  | "union"
+  | "pop"
+  | "liquido"
+  | "flecha";
 
 const MUSIC_VOLUME = 0.3;
 const EFFECT_VOLUME: Record<EffectName, number> = {
@@ -23,6 +30,8 @@ const EFFECT_VOLUME: Record<EffectName, number> = {
   // Suena en cada aleteo, varias veces por segundo: va bajo a propósito.
   pop: 0.3,
   liquido: 0.5,
+  // Una flecha que sale del tablero en "sacar flechas".
+  flecha: 0.55,
 };
 
 /** Margen antes de pausar: evita el corte al pasar de un nivel a otro. */

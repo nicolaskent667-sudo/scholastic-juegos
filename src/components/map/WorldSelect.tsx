@@ -56,7 +56,11 @@ export default function WorldSelect({ onPickWorld, onBack }: Props) {
           const done = world.levels.every((l) => (stars[l.id] ?? 0) > 0);
 
           return (
-            <li key={world.id}>
+            <li
+              key={world.id}
+              // Con un número impar de mundos, el último queda centrado.
+              className="sm:last:odd:col-span-2 sm:last:odd:mx-auto sm:last:odd:w-1/2"
+            >
               <button
                 type="button"
                 onClick={() => onPickWorld(world)}

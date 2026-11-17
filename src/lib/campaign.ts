@@ -1,5 +1,5 @@
 /**
- * La campaña: cuatro mundos, uno por minijuego, con sus niveles y las reglas
+ * La campaña: un mundo por minijuego, con sus niveles y las reglas
  * de estrellas. Sin React: solo datos y funciones puras.
  */
 
@@ -11,7 +11,8 @@ export type GameKind =
   | "wordsearch"
   | "memo"
   | "flow"
-  | "tubes";
+  | "tubes"
+  | "arrows";
 
 /** Cómo se configura el minijuego cuando se entra desde el mapa. */
 export type LevelConfig =
@@ -20,7 +21,8 @@ export type LevelConfig =
   | { kind: "wordsearch"; worldId: number }
   | { kind: "memo"; levelId: MemoLevelId; pairs: number }
   | { kind: "flow"; levelId: number }
-  | { kind: "tubes"; levelId: number };
+  | { kind: "tubes"; levelId: number }
+  | { kind: "arrows"; levelId: number };
 
 export type CampaignLevel = {
   /** Único en toda la campaña: "2-4". */
@@ -154,6 +156,23 @@ export const WORLDS: CampaignWorld[] = [
       { label: "7 colores", config: { kind: "tubes", levelId: 8 } },
     ]),
   },
+  {
+    id: 7,
+    name: "Sacar flechas",
+    hint: "Liberá a Sieni sin chocar",
+    emoji: "🏹",
+    kind: "arrows",
+    levels: makeLevels(7, [
+      { label: "5 flechas", config: { kind: "arrows", levelId: 1 } },
+      { label: "7 flechas", config: { kind: "arrows", levelId: 2 } },
+      { label: "10 flechas", config: { kind: "arrows", levelId: 3 } },
+      { label: "14 flechas", config: { kind: "arrows", levelId: 4 } },
+      { label: "16 flechas", config: { kind: "arrows", levelId: 5 } },
+      { label: "18 flechas", config: { kind: "arrows", levelId: 6 } },
+      { label: "20 flechas", config: { kind: "arrows", levelId: 7 } },
+      { label: "22 flechas", config: { kind: "arrows", levelId: 8 } },
+    ]),
+  },
 ];
 
 export const ALL_LEVELS: CampaignLevel[] = WORLDS.flatMap((w) => w.levels);
@@ -177,7 +196,8 @@ export type LevelResult =
   | { kind: "wordsearch"; hints: number }
   | { kind: "memo"; tries: number; pairs: number }
   | { kind: "flow"; moves: number; pipes: number }
-  | { kind: "tubes"; moves: number; par: number };
+  | { kind: "tubes"; moves: number; par: number }
+  | { kind: "arrows"; crashes: number };
 
 /**
  * Una estrella por terminar; las otras dos por hacerlo bien.
@@ -213,6 +233,10 @@ export function starsFor(result: LevelResult): 1 | 2 | 3 {
       if (result.moves <= result.par + 2) return 3;
       return result.moves <= result.par * 2 ? 2 : 1;
     }
+    case "arrows":
+      // Cada choque resta una, como muestra el contador en vivo del nivel.
+      if (result.crashes === 0) return 3;
+      return result.crashes === 1 ? 2 : 1;
   }
 }
 

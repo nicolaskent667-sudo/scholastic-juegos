@@ -56,6 +56,42 @@
   }
 }
 
+/*
+ * Para el tablero de "sacar flechas": dentro del SVG un px es una celda, así
+ * que el sacudón y el latido van en fracciones.
+ */
+@keyframes arrow-shake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-0.1px, 0.05px);
+  }
+  50% {
+    transform: translate(0.1px, -0.05px);
+  }
+  75% {
+    transform: translate(-0.06px, 0);
+  }
+}
+
+@keyframes arrow-hint {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes trail-march {
+  to {
+    stroke-dashoffset: -0.6;
+  }
+}
+
 @keyframes float {
   0%,
   100% {

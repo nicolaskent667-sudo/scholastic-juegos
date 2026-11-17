@@ -13,10 +13,11 @@ Tres juegos web para chicos, encadenados uno detrás del otro, construidos sobre
 | **Memotest** | Tres niveles: con nombre y color propio, con el mismo fondo, y sin nombres con variantes mínimas del mismo personaje. |
 | **Unir colores** | Tubos que conectan pares de puntos hasta llenar el tablero, al estilo Flow. |
 | **Mezclar tubos** | Water sort: volcar porciones de color hasta dejar cada tubo de un solo color. |
+| **Sacar flechas** | Cada flecha sale hacia donde apunta si nada se le cruza. Hay que sacarlas todas sin chocar para liberar a Sieni. |
 
 ## El mapa
 
-Desde "Jugar" se entra a la campaña: seis mundos, uno por juego, con **43 niveles y 129
+Desde "Jugar" se entra a la campaña: siete mundos, uno por juego, con **51 niveles y 153
 estrellas** en total. Cada mundo es un mapa con un sendero serpenteante donde los niveles se van
 desbloqueando de a uno.
 
@@ -61,6 +62,7 @@ src/
     memo/                memotest
     flow/                unir colores
     tubes/               mezclar tubos
+    arrows/              sacar flechas
     ui/buttons.ts        estilos de botón compartidos
   hooks/
     usePointerDrag.ts    arrastre de las piezas del rompecabezas
@@ -76,6 +78,7 @@ src/
     memo.ts              cartas y armado del mazo
     flow.ts              tableros de unir colores y validacion
     tubes.ts             niveles de mezclar tubos y reglas de volcado
+    arrows.ts            niveles de sacar flechas, choques y validación
     progress*.ts         persistencia en localStorage
 ```
 

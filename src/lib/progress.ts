@@ -6,6 +6,8 @@
 import type { MemoLevelId } from "@/lib/memo";
 
 export type AchievementId =
+  | "arrows-first"
+  | "arrows-nohint"
   | "tubes-first"
   | "tubes-nohint"
   | "flow-first"
@@ -46,6 +48,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "flow-first", emoji: "🎨", name: "Todo conectado", how: "Resolvé un tablero de unir colores" },
   { id: "flow-nohint", emoji: "🧵", name: "Sin mirar la pista", how: "Resolvé un tablero de unir colores sin pistas" },
   { id: "tubes-first", emoji: "🧪", name: "Cada cosa en su lugar", how: "Resolvé un nivel de mezclar tubos" },
+  { id: "arrows-first", emoji: "🏹", name: "Sieni libre", how: "Sacá todas las flechas de un tablero" },
+  { id: "arrows-nohint", emoji: "🎯", name: "Camino despejado", how: "Resolvé un tablero de flechas sin pistas" },
   { id: "tubes-nohint", emoji: "🔬", name: "Pulso firme", how: "Resolvé un nivel de mezclar tubos sin pistas" },
 ];
 
