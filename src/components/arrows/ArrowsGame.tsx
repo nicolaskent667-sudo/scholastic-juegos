@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import ArrowSprite from "@/components/arrows/ArrowSprite";
 import ArrowsWin from "@/components/arrows/ArrowsWin";
 import OptionsButton from "@/components/ui/OptionsButton";
-import DogSprite from "@/components/sprites/DogSprite";
+import SieniSprite from "@/components/sprites/SieniSprite";
 import { useArrowsBoard } from "@/hooks/useArrowsBoard";
 import { useProgress } from "@/hooks/useProgress";
 import { playEffect } from "@/lib/audio";
@@ -211,7 +211,7 @@ export default function ArrowsGame({ level, onBack, campaign }: Props) {
               <circle r={0.98} fill="white" stroke="var(--color-tinta)" strokeWidth={0.07} />
               <circle r={0.82} fill="var(--color-cielo)" />
               <g transform="translate(0 0.08) scale(0.0085)">
-                <DogSprite />
+                <SieniSprite />
               </g>
             </g>
           </g>

@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import {
   addStars,
+  buyItem,
   getServerSnapshot,
   getSnapshot,
   markWorldDone,
@@ -11,6 +12,7 @@ import {
   resetProgress,
   setSettings,
   subscribe,
+  toggleItem,
   unlock,
 } from "@/lib/progressStore";
 
@@ -34,6 +36,8 @@ export function useProgress() {
     recordLevelStars,
     recordMemoResult,
     setSettings,
+    buyItem,
+    toggleItem,
     reset: resetProgress,
   };
 }

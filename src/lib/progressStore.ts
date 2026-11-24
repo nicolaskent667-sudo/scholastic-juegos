@@ -21,6 +21,7 @@ import {
   type Settings,
 } from "@/lib/progress";
 import type { MemoLevelId } from "@/lib/memo";
+import { SHOP_ITEMS, canBuy, findItem, type ShopItemId } from "@/lib/shop";
 import { setAudioEnabled, setAudioVolume } from "@/lib/audio";
 
 export type Snapshot = {
@@ -161,6 +162,45 @@ export function recordLevelStars(levelId: string, stars: number): void {
     const current = prev.levelStars[levelId] ?? 0;
     if (stars <= current) return prev;
     return { ...prev, levelStars: { ...prev.levelStars, [levelId]: stars } };
+  });
+}
+
+/**
+ * Compra algo de la tienda y se lo pone. Vuelve a chequear saldo y candado
+ * acá, no solo en el botón: es la única puerta para gastar estrellas.
+ * Devuelve si la compra se hizo.
+ */
+export function buyItem(id: ShopItemId): boolean {
+  const item = findItem(id);
+  if (!item) return false;
+  let bought = false;
+  update((prev) => {
+    if (!canBuy(item, prev.levelStars, prev.owned).ok) return prev;
+    bought = true;
+    const owned = [...prev.owned, id];
+    const unlocked = new Set(prev.unlocked);
+    unlocked.add("shop-first");
+    if (owned.length === SHOP_ITEMS.length) unlocked.add("shop-all");
+    return {
+      ...prev,
+      owned,
+      equipped: { ...prev.equipped, [item.slot]: id },
+      unlocked: [...unlocked],
+    };
+  });
+  return bought;
+}
+
+/** Se pone algo ya comprado, o se lo saca si ya lo tenía puesto. */
+export function toggleItem(id: ShopItemId): void {
+  const item = findItem(id);
+  if (!item) return;
+  update((prev) => {
+    if (!prev.owned.includes(id)) return prev;
+    const equipped = { ...prev.equipped };
+    if (equipped[item.slot] === id) delete equipped[item.slot];
+    else equipped[item.slot] = id;
+    return { ...prev, equipped };
   });
 }
 

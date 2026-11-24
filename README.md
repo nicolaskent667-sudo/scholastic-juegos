@@ -29,6 +29,17 @@ Todo se juega desde el mapa. Los selectores sueltos de cada juego (dificultad de
 mundos de la sopa, niveles del memotest) siguen en el código pero ya no tienen acceso desde la
 interfaz.
 
+## La tienda
+
+Desde la portada se entra a la tienda, donde las estrellas de la campaña sirven para vestir a
+Sieni: tres accesorios (sombrero, anteojos y barbijo, combinables entre sí), tres vestuarios
+(vestido, malla y traje de Papá Noel) y tres amigos que se paran a su lado. Los amigos además piden
+haber terminado un mundo.
+
+Los nueve suman 150 estrellas, así que la campaña completa alcanza para todo. El saldo no se guarda:
+es lo ganado menos lo comprado, y comprar no le baja estrellas a ningún nivel. Lo que tiene puesto
+se ve en la portada, en el mapa y en "Sacar flechas".
+
 ## Arrancar
 
 Hace falta [Node.js](https://nodejs.org) 20 o más nuevo.
@@ -62,6 +73,7 @@ src/
     memo/                memotest
     flow/                unir colores
     tubes/               mezclar tubos
+    shop/                la tienda
     arrows/              sacar flechas
     ui/buttons.ts        estilos de botón compartidos
   hooks/
@@ -78,6 +90,7 @@ src/
     memo.ts              cartas y armado del mazo
     flow.ts              tableros de unir colores y validacion
     tubes.ts             niveles de mezclar tubos y reglas de volcado
+    shop.ts              catálogo de la tienda, saldo y candados
     arrows.ts            niveles de sacar flechas, choques y validación
     progress*.ts         persistencia en localStorage
 ```

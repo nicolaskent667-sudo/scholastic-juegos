@@ -1,6 +1,6 @@
 "use client";
 
-import DogSprite from "@/components/sprites/DogSprite";
+import SieniSprite from "@/components/sprites/SieniSprite";
 import { useProgress } from "@/hooks/useProgress";
 import {
   STARS_PER_LEVEL,
@@ -223,7 +223,7 @@ export default function LevelMap({ world, onPickLevel, onBack }: Props) {
                     />
                     {/* Sieni asomando sobre el nivel actual */}
                     <g transform={`translate(${point.x} ${point.y - NODE_R - 42}) scale(0.52)`}>
-                      <DogSprite />
+                      <SieniSprite />
                     </g>
                   </>
                 )}

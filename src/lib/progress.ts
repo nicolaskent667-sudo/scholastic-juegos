@@ -4,8 +4,16 @@
  */
 
 import type { MemoLevelId } from "@/lib/memo";
+import {
+  isItemId,
+  sanitizeEquipped,
+  type Equipped,
+  type ShopItemId,
+} from "@/lib/shop";
 
 export type AchievementId =
+  | "shop-first"
+  | "shop-all"
   | "arrows-first"
   | "arrows-nohint"
   | "tubes-first"
@@ -47,6 +55,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "memo-perfect", emoji: "✨", name: "Memoria perfecta", how: "Completá un memotest sin errar ni una" },
   { id: "flow-first", emoji: "🎨", name: "Todo conectado", how: "Resolvé un tablero de unir colores" },
   { id: "flow-nohint", emoji: "🧵", name: "Sin mirar la pista", how: "Resolvé un tablero de unir colores sin pistas" },
+  { id: "shop-first", emoji: "🛍️", name: "Primera compra", how: "Comprale algo a Sieni en la tienda" },
+  { id: "shop-all", emoji: "👗", name: "Placard lleno", how: "Comprá todo lo de la tienda" },
   { id: "tubes-first", emoji: "🧪", name: "Cada cosa en su lugar", how: "Resolvé un nivel de mezclar tubos" },
   { id: "arrows-first", emoji: "🏹", name: "Sieni libre", how: "Sacá todas las flechas de un tablero" },
   { id: "arrows-nohint", emoji: "🎯", name: "Camino despejado", how: "Resolvé un tablero de flechas sin pistas" },
@@ -77,6 +87,10 @@ export type Progress = {
   memoBest: MemoBest;
   /** Estrellas (1-3) por nivel de la campaña, indexadas por su id. */
   levelStars: Record<string, number>;
+  /** Lo comprado en la tienda. Se paga con las estrellas de `levelStars`. */
+  owned: ShopItemId[];
+  /** Lo que Sieni tiene puesto, una cosa por lugar. */
+  equipped: Equipped;
   settings: Settings;
 };
 
@@ -86,6 +100,8 @@ export const DEFAULT_PROGRESS: Progress = {
   worldsDone: [],
   memoBest: {},
   levelStars: {},
+  owned: [],
+  equipped: {},
   settings: { reducedMotion: false, sound: true, volume: 1 },
 };
 
@@ -162,12 +178,18 @@ export function sanitizeProgress(raw: unknown): Progress {
     }
   }
 
+  const owned = Array.isArray(data.owned)
+    ? [...new Set(data.owned.filter(isItemId))]
+    : [];
+
   return {
     unlocked: [...new Set(unlocked)],
     stars,
     worldsDone: [...new Set(worldsDone)],
     memoBest,
     levelStars,
+    owned,
+    equipped: sanitizeEquipped(data.equipped, owned),
     settings: {
       reducedMotion: settings.reducedMotion === true,
       // El sonido viene prendido salvo que se haya apagado a propósito.

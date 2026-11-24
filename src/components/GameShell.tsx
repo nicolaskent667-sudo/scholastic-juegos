@@ -9,6 +9,7 @@ import FlowGame from "@/components/flow/FlowGame";
 import MemoGame from "@/components/memo/MemoGame";
 import PuzzleGame from "@/components/PuzzleGame";
 import StartScreen from "@/components/start/StartScreen";
+import ShopScreen from "@/components/shop/ShopScreen";
 import WordSearchGame from "@/components/wordsearch/WordSearchGame";
 import { useBackgroundMusic } from "@/hooks/useBackgroundMusic";
 import type { CampaignLevel, CampaignWorld } from "@/lib/campaign";
@@ -27,7 +28,8 @@ type Screen =
   | "flappy"
   | "wordsearch"
   | "memo"
-  | "flow";
+  | "flow"
+  | "shop";
 
 /** Único dueño de qué pantalla se ve. */
 export default function GameShell() {
@@ -40,6 +42,7 @@ export default function GameShell() {
 
   const goToStart = useCallback(() => setScreen("start"), []);
   const goToWorlds = useCallback(() => setScreen("worlds"), []);
+  const goToShop = useCallback(() => setScreen("shop"), []);
   const goToPuzzle = useCallback(() => setScreen("puzzle"), []);
   const goToFlappy = useCallback(() => setScreen("flappy"), []);
   const goToWordSearch = useCallback(() => setScreen("wordsearch"), []);
@@ -76,6 +79,9 @@ export default function GameShell() {
   }, [nextLevel, backToMap]);
 
   switch (screen) {
+    case "shop":
+      return <ShopScreen onBack={goToStart} />;
+
     case "worlds":
       return <WorldSelect onPickWorld={pickWorld} onBack={goToStart} />;
 
@@ -125,6 +131,6 @@ export default function GameShell() {
       );
 
     default:
-      return <StartScreen onPlay={goToWorlds} />;
+      return <StartScreen onPlay={goToWorlds} onShop={goToShop} />;
   }
 }

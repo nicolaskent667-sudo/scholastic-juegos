@@ -1,3 +1,6 @@
+import { OutfitBody, OutfitHead } from "@/components/sprites/outfits";
+import { visibleLook, type Equipped } from "@/lib/shop";
+
 export type BowColor = "rosa" | "azul" | "amarillo";
 
 const BOW_FILL: Record<BowColor, string> = {
@@ -16,7 +19,11 @@ export type DogProps = {
   cap?: boolean;
   /** Colgante del pecho. */
   pendant?: "corazon" | "estrella" | null;
+  /** Lo que tiene puesto de la tienda. */
+  look?: Equipped;
 };
+
+const NO_LOOK: Equipped = {};
 
 /** Sieni, la perrita roja del picnic. Centrada en (0,0). */
 export default function DogSprite({
@@ -25,7 +32,13 @@ export default function DogSprite({
   wink = false,
   cap = false,
   pendant = "corazon",
+  look = NO_LOOK,
 }: DogProps) {
+  const outfit = visibleLook(look);
+  // El sombrero, el gorro de Papá Noel y las antiparras van donde el moño.
+  const hideBow =
+    outfit.cabeza !== undefined || outfit.ropa === "noel" || outfit.ropa === "malla";
+
   return (
     <g stroke="var(--color-tinta)" strokeWidth={5} strokeLinejoin="round">
       <ellipse cx={0} cy={70} rx={52} ry={9} fill="var(--color-blush)" stroke="none" />
@@ -37,20 +50,22 @@ export default function DogSprite({
       <ellipse cx={-20} cy={70} rx={13} ry={8} fill="var(--color-crema)" />
       <ellipse cx={20} cy={70} rx={13} ry={8} fill="var(--color-crema)" />
 
-      {pendant === "corazon" && (
+      {!outfit.ropa && pendant === "corazon" && (
         <path
           d="M 0 50 L -10 39 A 6 6 0 0 1 0 32 A 6 6 0 0 1 10 39 Z"
           fill="var(--color-sol)"
           strokeWidth={3.5}
         />
       )}
-      {pendant === "estrella" && (
+      {!outfit.ropa && pendant === "estrella" && (
         <path
           d="M 0 30 L 4 42 L 16 42 L 6 49 L 10 60 L 0 53 L -10 60 L -6 49 L -16 42 L -4 42 Z"
           fill="var(--color-sol)"
           strokeWidth={3.5}
         />
       )}
+
+      <OutfitBody id={outfit.ropa} />
 
       {/* Orejas */}
       <ellipse cx={-42} cy={4} rx={15} ry={26} fill="#c93b48" />
@@ -68,7 +83,8 @@ export default function DogSprite({
           <circle cx={42} cy={-28} r={5} fill="var(--color-sol)" strokeWidth={3} />
         </>
       ) : (
-        bow !== null && (
+        bow !== null &&
+        !hideBow && (
           <>
             <path d="M -26 -36 l -18 -10 l 0 20 z" fill={BOW_FILL[bow]} />
             <path d="M -4 -36 l 18 -10 l 0 20 z" fill={BOW_FILL[bow]} />
@@ -113,6 +129,8 @@ export default function DogSprite({
         strokeWidth={3.5}
         strokeLinecap="round"
       />
+
+      <OutfitHead look={outfit} />
     </g>
   );
 }
