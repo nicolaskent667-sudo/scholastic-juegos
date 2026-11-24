@@ -221,10 +221,6 @@ export default function LevelMap({ world, onPickLevel, onBack }: Props) {
                       strokeWidth={5}
                       strokeDasharray="10 10"
                     />
-                    {/* Sieni asomando sobre el nivel actual */}
-                    <g transform={`translate(${point.x} ${point.y - NODE_R - 42}) scale(0.52)`}>
-                      <SieniSprite />
-                    </g>
                   </>
                 )}
 
@@ -292,6 +288,20 @@ export default function LevelMap({ world, onPickLevel, onBack }: Props) {
               </g>
             );
           })}
+
+          {/*
+           * Sieni asomando sobre el nivel actual. Va después de todos los
+           * niveles: si no, el círculo del siguiente le tapaba el sombrero.
+           * No recibe toques, para no tapar el botón del nivel de arriba.
+           */}
+          {currentIndex !== -1 && (
+            <g
+              transform={`translate(${points[currentIndex].x} ${points[currentIndex].y - NODE_R - 42}) scale(0.52)`}
+              pointerEvents="none"
+            >
+              <SieniSprite />
+            </g>
+          )}
         </svg>
       </div>
 

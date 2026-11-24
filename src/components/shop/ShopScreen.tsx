@@ -184,23 +184,25 @@ export default function ShopScreen({ onBack }: Props) {
           const chosen = item.id === selected.id;
 
           return (
-            <li key={item.id}>
+            <li key={item.id} className="flex flex-col">
               <button
                 type="button"
                 onClick={() => setSelectedId(item.id)}
                 aria-pressed={chosen}
-                className={`flex w-full cursor-pointer flex-col items-center gap-1.5 rounded-2xl border-[3px] border-tinta bg-white p-1.5 outline-none transition hover:-translate-y-0.5 focus-visible:ring-4 focus-visible:ring-cielo-azul sm:p-2 ${
+                className={`flex h-full w-full cursor-pointer flex-col items-center gap-1.5 rounded-2xl border-[3px] border-tinta bg-white p-1.5 outline-none transition hover:-translate-y-0.5 focus-visible:ring-4 focus-visible:ring-cielo-azul sm:p-2 ${
                   chosen ? "ring-4 ring-sol" : ""
                 }`}
               >
+                {/* Cuadro fijo: los dibujos altos no lo estiran */}
                 <span
-                  className={`flex aspect-square w-full items-center justify-center rounded-xl border-2 border-blush p-2 ${
+                  className={`relative aspect-square w-full overflow-hidden rounded-xl border-2 border-blush ${
                     CARD_TONES[i % CARD_TONES.length]
                   } ${world !== null ? "opacity-60 grayscale" : ""}`}
                 >
-                  <ItemArt id={item.id} className="h-full w-full" />
+                  <ItemArt id={item.id} className="absolute inset-[10%] h-[80%] w-[80%]" />
                 </span>
-                <span className="text-center text-sm font-extrabold leading-tight text-tinta sm:text-base">
+                {/* Dos renglones siempre, para que las tarjetas queden parejas */}
+                <span className="flex min-h-[2.5em] flex-1 items-center text-center text-sm font-extrabold leading-tight text-tinta sm:text-base">
                   {item.name}
                 </span>
 
@@ -227,11 +229,14 @@ export default function ShopScreen({ onBack }: Props) {
                   </span>
                 )}
               </button>
-              {!has && world === null && missing > 0 && (
-                <p className="mt-1 text-center text-xs font-bold text-tinta/50">
-                  Te faltan {missing}
-                </p>
-              )}
+              {/* El renglón queda reservado aunque esté vacío: tarjetas parejas */}
+              <p
+                className={`mt-1 text-center text-xs font-bold text-tinta/50 ${
+                  !has && world === null && missing > 0 ? "" : "invisible"
+                }`}
+              >
+                Te faltan {Math.max(0, missing)}
+              </p>
             </li>
           );
         })}
